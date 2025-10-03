@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title></title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="nav-bar" id="">
+  <!-- change links as the project progresses -->
+      <a href="https://www.csn.edu/">
+        <img src="Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
+      </a>
+      <a href="https://enroll.csn.edu/" class="nav-links">
+        <h6 class="nav-links-">Areas of Interest</h6>
+      </a>
+      <a href="https://www.csn.edu/giving" class="nav-links">    
+        <h6 class="nav-links">Give</h6> 
+      </a>
+      <a href="home.html" class="nav-links">
+        <h6 class="nav-links">Login</h6> 
+      </a>
+      <a href="https://www.csn.edu/apply" class="nav-links">
+        <h6 class="nav-links">Apply</h6>
+      </a>
+      <a href="https://www.csn.edu/admissions/visit" class="nav-links">
+        <h6 class="nav-links">Visit</h6>
+      </a>
+      <a href="https://my.csn.edu/en-US/csn-rfi/" class="nav-links">
+        <h6 class="nav-links">Request Info</h6> 
+      </a>
+    </div>
+    <div class="registration-page-content">
+      <h1>Account Registration</h1>
+      <form class="registration-form" action="student-dash.html" method="post">
+        <input type="text" id="first-name" class="login-input" name="first-name" placeholder="First Name" required>
+        <input type="text" id="last-name" class="login-input" name="last-name" placeholder="Last Name" required>
+        <input type="email" id="email" class="login-input" name="email" placeholder="CSN Email" required>
+        <!-- depending on .cs.edu / .student.csn.edu is what account type it is -->
+        <input type="password" id="password" class="login-input" name="password" placeholder="Password" required>
+        <input type="password" id="confirm-password" class="login-input" name="confirm-password" placeholder="Confirm Password" required>
+        <!-- need to add password verification, and requirements -->
+        <div class="submit-buttons">
+          <input type="submit" id="register-button" class="register-button" value="REGISTER">
+        </div>
+      </form>
+    </div>
+    
+  <script src="script.js"></script>
+
+</body>
+
+</html>
