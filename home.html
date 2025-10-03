@@ -9,15 +9,40 @@
 </head>
 
 <body>
-<h1>LogIn</h1>
-<p>CSN Exam Registration system</p>
-<div id="submitButton" class="submitButton">
-  <h3>SUBMIT</h3>
-</div>
-<div id="submitButton" class="submitButton">
-  <h3>REGISTER</h3>
-</div>
-  <script src="script.js"></script>
+  <div class="nav-bar" id="">
+    <img src="CSN-logo.png" alt="CSN Logo" class="csn-logo">
+    <h6 class="nav-links">Areas of Interest</h6>    
+    <h6 class="nav-links">Give</h6> 
+    <h6 class="nav-links">Login</h6> 
+    <h6 class="nav-links">Apply</h6>
+    <h6 class="nav-links">Visit</h6>
+    <h6 class="nav-links">Request Info</h6> 
+  </div>
+  <div class="banner">
+    <h4 class="banner-text">
+      From Registration to Results - Exams Simplified
+    </h4>
+  </div>
+  <div class ="title-section">
+    <h2 class="sub-title">College of Southern Nevada</h2>
+    <h1 class="main-title">Exam Registration System</h1>
+  </div>
+  <div class="login-section">
+    <h3 class="login-prompt">Log In to Access Your Dashboard</h3>
+      <form class="login-form" action="student-dash.html" method="post">
+        <input type="text" id="username" class="login-input" name="username" placeholder="Email" required>
+        <input type="password" id="password" class="login-input" name="password" placeholder="Password" required>
+        <div class="submit-buttons">
+          <input type="submit" id="login-button" class="student-button" formaction="student-dash.html" value="STUDENT LOGIN">
+          <input type="reset" id="reset-button" class="faculty-button" formaction="faculty-dash.html" value="FACULTY LOGIN">
+       </div>
+      </form>
+    <a href="register.html" class="register">
+      <div id="register-button" class="register-button">
+        <button class="register-button">REGISTER</button>
+      </div>
+    </a>
+    <script src="script.js"></script>
 
 </body>
 
