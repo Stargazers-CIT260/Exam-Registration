@@ -1,0 +1,10 @@
+CREATE TABLE Users (
+  User_ID INT PRIMARY KEY UNIQUE,
+  Email VARCHAR(100) NOT NULL UNIQUE,
+  First_Name VARCHAR(50) NOT NULL,
+  Last_Name  VARCHAR(50) NOT NULL,
+  Role ENUM('student','faculty') NOT NULL DEFAULT 'student'
+);
+
+
+
