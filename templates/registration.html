@@ -5,14 +5,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title></title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link href="../static/style.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
 <div class="nav-bar" id="">
   <!-- change links as the project progresses -->
       <a href="https://www.csn.edu/">
-        <img src="Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
+        <img src="../static/Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
       </a>
       <a href="https://enroll.csn.edu/" class="nav-links">
         <h6 class="nav-links-">Areas of Interest</h6>
@@ -35,7 +35,7 @@
     </div>
     <div class="registration-page-content">
       <h1>Account Registration</h1>
-      <form class="registration-form" action="student-dash.html" method="post">
+      <form class="registration-form" action="/register" method="post">
         <input type="text" id="first-name" class="login-input" name="first-name" placeholder="First Name" required>
         <input type="text" id="last-name" class="login-input" name="last-name" placeholder="Last Name" required>
         <input type="email" id="email" class="login-input" name="email" placeholder="CSN Email" required>
@@ -43,6 +43,9 @@
         <input type="password" id="password" class="login-input" name="password" placeholder="Password" required>
         <input type="password" id="confirm-password" class="login-input" name="confirm-password" placeholder="Confirm Password" required>
         <!-- need to add password verification, and requirements -->
+        {% if msg %}
+        <div class="error-msg">{{ msg }}</div>
+        {% endif %}
         <div class="submit-buttons">
           <input type="submit" id="register-button" class="register-button" value="REGISTER">
         </div>

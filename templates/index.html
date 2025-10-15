@@ -5,14 +5,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title></title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link href="../static/style.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
   <div class="landing-page">
     <div class="nav-bar" id="">
       <a href="https://www.csn.edu/">
-        <img src="Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
+        <img src="../static/Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
       </a>
       <a href="https://enroll.csn.edu/" class="nav-links">
         <h6 class="nav-links-">Areas of Interest</h6>
@@ -44,16 +44,18 @@
     </div>
     <div class="login-section">
       <h3 class="login-prompt">Log In to Access Your Dashboard</h3>
-        <form class="login-form" action="student-dash.html" method="post">
+        <form class="login-form" method="post">
           <input type="email" id="email" class="login-input" name="username" placeholder="Email" required>
           <input type="password" id="password" class="login-input" name="password" placeholder="Password" required>
-      
+            {% if msg %}
+            <div class="error-msg">{{ msg }}</div>
+            {% endif %}
             <div class="submit-buttons">
-            <input type="submit" id="login-button" class="student-button" formaction="student-dash.html" value="STUDENT LOGIN">
-            <input type="submit" id="faculty-button" class="faculty-button" formaction="faculty-dash.html" value="FACULTY LOGIN">
+            <input type="submit" id="login-button" class="student-button" formaction="/student-login" value="STUDENT LOGIN">
+            <input type="submit" id="faculty-button" class="faculty-button" formaction="/faculty-login" value="FACULTY LOGIN">
           </div>
         </form>
-      <a href="registration.html" class="register-title">
+      <a href="/register" class="register-title">
         <div id="register-button" class="register-button-div">
           <button class="register-button">New User?</button>
         </div>
