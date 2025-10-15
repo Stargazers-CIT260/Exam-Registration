@@ -117,7 +117,7 @@ def register():
             cursor.close()
 
         if role == 'student':
-            return redirect('/student_dash')
+            return redirect('/student-dash')
         else:
             return redirect('/faculty-dash')
 
