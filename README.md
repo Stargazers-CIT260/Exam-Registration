@@ -25,28 +25,30 @@
    source /path/to/project/Database/Users.sql;
    source /path/to/project/Database/Registrations.sql;
    ```
-7. **Clone git repository**
+7. **Open a new terminal and CD to Where You Want the Repo**
+
+8. **Clone git repository**
    ```
    > git clone https://github.com/Stargazers-CIT260/Exam-Registration.git
    ```
-8. **Create a new virtual environment**
+9. **Create a new virtual environment**
    ```
    > python -m venv .venv
    ```
-9. **Activate the environment**<br>
-   Windows:
-   ```
-   > .venv\scripts\activate
-   ```
-   Linux & Mac OS:
-   ```
-   > source .venv/bin/activate
-   ```
-10. **Install project dependencies**
+10. **Activate the environment**<br>
+    Windows:
+    ```
+    > .venv\scripts\activate
+    ```
+    Linux & Mac OS:
+    ```
+    > source .venv/bin/activate
+    ```
+11. **Install project dependencies**
     ```
     > pip install -r requirements.txt
     ```
-11. **Run the debug server**
+12. **Run the debug server**
     ```
     > flask --debug --app backend run
     ```
