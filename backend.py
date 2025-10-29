@@ -35,8 +35,6 @@ def normalize_email(email):
     # replace with normalized form
     return email_info.normalized
 
-
-
 @app.route('/')
 @app.route('/student-login', methods=['GET', 'POST'])
 @app.route('/faculty-login', methods=['GET', 'POST'])
@@ -76,6 +74,7 @@ def student_dash():
 @app.route('/faculty-dash')
 def faculty_dash():
     return render_template('faculty-dash.html')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
@@ -106,9 +105,20 @@ def register():
         else:
             msg = 'Please enter a valid CSN email address'
             return render_template('registration.html', msg=msg)
+
+        if role == 'student' and not email[:10].isnumeric():
+            msg = 'Student must use NSHE number in email'
+            return render_template('registration.html', msg=msg)
+
+        if role == 'student' and password != email[:10]:
+            msg = 'Student password must be NSHE number'
+            return render_template('registration.html', msg=msg)
+
         cursor = mysql.get_db().cursor()
         try:
-            cursor.execute('INSERT INTO Users (Email, First_Name, Last_name, Password, Role) VALUES (%s, %s, %s, %s, %s)', (email, first_name, last_name, password, role))
+            cursor.execute(
+                'INSERT INTO Users (Email, First_Name, Last_name, Password, Role) VALUES (%s, %s, %s, %s, %s)',
+                (email, first_name, last_name, password, role))
             mysql.get_db().commit()
         except:
             msg = "Account already registered with that email address"
