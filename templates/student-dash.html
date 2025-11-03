@@ -34,12 +34,12 @@
   </div>
   <div class="student-dashboard-content">
     <div class="dashboard-header">
-      <h1>Welcome, [Student Name]</h1>
+      <h1>Welcome, {{ student_name }}</h1>
       <!-- Replace [Student Name] with dynamic content -->
         <div class="dashboard-subheader">
           <h2>Student Dashboard</h2>
           <a href="schedule.html" class="schedule-button">Schedule Exam</a>
-          <a href="index.html" class="logout-button">Logout</a>
+          <a href="/logout" class="logout-button">Logout</a>
         </div>
     <div class="upcoming-exams">
       <h2>Upcoming Exams</h2>
