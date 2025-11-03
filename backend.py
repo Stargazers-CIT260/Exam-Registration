@@ -3,17 +3,21 @@ from flask import url_for
 from flask import redirect
 from flask import request
 from flask import render_template
+from flask import session
 from markupsafe import escape
 from flaskext.mysql import MySQL
 from email_validator import validate_email, EmailNotValidError
 
+
 app = Flask(__name__)
 
+app.secret_key = 'supersecretkey'
 # MySQL Configuration
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-app.config['MYSQL_DATABASE_USER'] = 'Exam_Registration'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'admin'
-app.config['MYSQL_DATABASE_DB'] = 'Exam_Registration'
+app.config['MYSQL_DATABASE_HOST'] = 'tramway.proxy.rlwy.net'
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'OnqbvfzavPfTNvrbNVQCYtgAqwhOvoMN'
+app.config['MYSQL_DATABASE_DB'] = 'railway'
+app.config['MYSQL_DATABASE_PORT'] = 56717
 
 mysql = MySQL()
 mysql.init_app(app)
@@ -21,13 +25,22 @@ mysql.init_app(app)
 def validate_login(username, password, role):
     cursor = mysql.get_db().cursor()
     try:
-        cursor.execute('SELECT Password, Role FROM Users WHERE Email = %s LIMIT 1', (username,))
-        (user_password, user_role) = cursor.fetchone()
-    except:
-        return False
+        cursor.execute('SELECT Password, Role FROM Users WHERE Email = %s LIMIT 1', (username,))#update from this below
+        row = cursor.fetchone()
+        if not row:
+            return False
+        user_password, user_role = row
+        return password == user_password and role == user_role
     finally:
         cursor.close()
-    return password == user_password and role == user_role
+
+    #update validate login to avoid cashes
+    #    (user_password, user_role) = cursor.fetchone()
+    #except:
+    #    return False
+    #finally:
+    #    cursor.close()
+    #return password == user_password and role == user_role
 
 def normalize_email(email):
     # validate and get info
@@ -59,6 +72,7 @@ def login():
                 msg = 'Incorrect username/password!'
         else:
             if validate_login(username, password, 'student'):
+                session['user_email'] = username
                 # session['loggedin'] = True
                 # session['id'] = account['id']
                 # session['username'] = account['username']
@@ -69,7 +83,27 @@ def login():
 
 @app.route('/student-dash')
 def student_dash():
-    return render_template('student-dash.html')
+    if 'user_email' not in session:  #make sure the user is logged in and in session
+        return redirect (url_for('login'))
+    
+    #get student's first and last name from DB
+    cursor = mysql.get_db().cursor()
+    try: 
+        cursor.execute(
+        'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
+        (session['user_email'],)
+        )
+        row = cursor.fetchone()
+    finally:
+        cursor.close()  
+    
+    student_name = "STUDENT"
+    if row:
+        first_name, last_name = row
+        student_name = f"{first_name} {last_name}".upper() #capitalized
+
+    return render_template('student-dash.html', student_name=student_name)
+    
 
 @app.route('/faculty-dash')
 def faculty_dash():
@@ -132,3 +166,12 @@ def register():
             return redirect('/faculty-dash')
 
     return render_template('registration.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=True)
