@@ -1,0 +1,9 @@
+Open MySQL Workbench(or whichever you prefer)
+Add + to create new connection
+
+Fill below Info
+Host: tramway.proxy.rlwy.net
+Port: 56717
+User: root 
+Password: OnqbvfzavPfTNvrbNVQCYtgAqwhOvoMN
+
