@@ -24,13 +24,33 @@ BEGIN
 END$$
 DELIMITER ;
 
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_location)
-VALUES ('C001', 'Math 101', '2025-12-20', '09:00:00', 90, 'North A101');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_location)
-VALUES ('C002', 'Science 101', '2025-12-18', '12:30:00', 90, 'South A103');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_location)
-VALUES ('C001', 'Math 102', '2025-12-18', '09:30:00', 90, 'South B101');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_location)
-VALUES ('C004', 'CIT 101', '2025-12-19', '10:00:00', 90, 'North C101');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_location)
-VALUES ('C004', 'CIT 102', '2025-12-18', '11:00:00', 90, 'North A101');
+
+SET SQL_SAFE_UPDATES = 0;
+DELETE FROM Exams;
+
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C001', 'MATH 101', '2025-12-18', '09:00:00', 90, 'North', 'A103');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C001', 'MATH 102', '2025-12-18', '12:30:00', 90, 'South', 'C201');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C001', 'MATH 103', '2025-12-18', '15:00:00', 90, 'Henderson', 'A201');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C001', 'MATH 104', '2025-12-20', '09:00:00', 90, 'North', 'A103');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C001', 'MATH 105', '2025-12-20', '12:30:00', 90, 'South', 'C201');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C001', 'MATH 106', '2025-12-20', '15:30:00', 90, 'Henderson', 'A201');
+
+
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C002', 'CHEM 101', '2025-12-18', '10:00:00', 90, 'North', 'A105');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C002', 'CHEM 102', '2025-12-18', '13:30:00', 90, 'South', 'B105');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C002', 'CHEM 103', '2025-12-18', '15:30:00', 90, 'Henderson', 'C101');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C002', 'CHEM 104', '2025-12-20', '13:00:00', 90, 'North', 'A105');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C002', 'CHEM 105', '2025-12-20', '13:30:00', 90, 'South', 'B105');
+INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
+VALUES ('C002', 'CHEM 106', '2025-12-20', '15:30:00', 90, 'Henderson', 'C101');

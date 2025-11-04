@@ -32,3 +32,6 @@ INSERT INTO Courses (Course_name) VALUES ('Psychology');
 INSERT INTO Courses (Course_name) VALUES ('Accounting');
 INSERT INTO Courses (Course_name) VALUES ('Economics');
 
+UPDATE Courses
+SET Course_name = 'Chemistry'
+WHERE Course_ID = 'C002'
