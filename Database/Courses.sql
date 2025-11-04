@@ -26,3 +26,9 @@ INSERT INTO Courses (Course_name) VALUES ('History');
 INSERT INTO Courses (Course_name) VALUES ('Computer Science');
 INSERT INTO Courses (Course_name) VALUES ('English');
 INSERT INTO Courses (Course_name) VALUES ('Biology');
+
+INSERT INTO Courses (Course_name) VALUES ('Art');
+INSERT INTO Courses (Course_name) VALUES ('Psychology');
+INSERT INTO Courses (Course_name) VALUES ('Accounting');
+INSERT INTO Courses (Course_name) VALUES ('Economics');
+
