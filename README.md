@@ -44,7 +44,7 @@
     ```
     > source .venv/bin/activate
     ```
-11. **Install project dependencies**
+11. **Install project dependencies (might need to do this before step 9)**
     ```
     > pip install -r requirements.txt
     ```
