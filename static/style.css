@@ -1,10 +1,48 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap");
+/* ========================================
+   CSN EXAM REGISTRATION SYSTEM STYLES
+   ========================================
+   (EACH BLOCK OF CODE IS A CSS STYLE RULESET FOR A SPECIFIC ELEMENT)
+   CONTENTS:
+   1. Global Styles & Fonts
+   2. Navigation & Banner
+   3. Page Layout
+   4. Forms & Inputs
+   5. Buttons
+   6. Dashboard Components
+   7. Error Messages
+   
+   COLOR SCHEME:
+   - Primary Blue: #004890 (CSN brand color)
+   - Light Gray: #f4f4f4 (background)
+   - Medium Gray: #ccc (borders)
+   - Dark Gray: gray (buttons)
+   
+   COMMON CLASSES:
+   - *-button: Button styles, e.g. (.student-button, .faculty-button)
+   - nav-*: Navigation elements
+   - *-form: Form containers
+   - exam-*: Exam dashboard elements
+   
+   FLEXBOX PATTERNS:
+   Most layout uses flexbox for alignment:
+   - display: flex
+   - justify-content: center/space-around
+   - align-items: center
+   ======================================== */
 
+/* Import DM Sans from Google Fonts - Used throughout the site */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap");
+/* ----------------------------------------
+   1. GLOBAL STYLES
+   ---------------------------------------- */
 body {
-    font-family: 'DM Sans', sans-serif;
-    margin: 0px;
+    font-family: 'DM Sans', sans-serif;  /* Primary font */
+    margin: 0px;                         /* Remove default spacing */
 }
 
+/* ----------------------------------------
+   2. PAGE LAYOUT - Main containers
+   ---------------------------------------- */
 .landing-page {
     background-color: #f4f4f4;
     min-height: 100vh;
@@ -13,11 +51,15 @@ body {
     margin: 0px;
 }
 
+/* ----------------------------------------
+   3. NAVIGATION BAR STYLES
+   Uses flexbox for responsive layout
+   ---------------------------------------- */
 .nav-bar {
-    display: flex;
-	align-items: center;
-	justify-content: space-around;
-	flex-wrap: flex;
+    display: flex;                    /* Enable flexbox layout */
+    align-items: center;              /* Vertical center alignment */
+    justify-content: space-around;    /* Spread items evenly */
+    flex-wrap: flex;                  /* Allow wrapping on small screens */
     padding: 15px;
     margin: 0px;
 }
@@ -80,10 +122,14 @@ h3 {
     font-size: 20px;
 }
 
+/* ----------------------------------------
+   4. FORM STYLES
+   Vertical stack layout with consistent spacing
+   ---------------------------------------- */
 .login-form {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
+    display: flex;                    /* Stack form elements vertically */
+    flex-direction: column;           /* Top to bottom layout */
+    margin-bottom: 20px;              /* Space below form */
 }
 
 .login-input {
@@ -107,14 +153,18 @@ h3 {
     margin-top: 20px;
 }
 
+/* ----------------------------------------
+   5. BUTTON STYLES
+   Consistent styling for all interactive buttons
+   ---------------------------------------- */
 .student-button, .faculty-button {
-    padding: 10px 20px;
-    margin: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
+    padding: 10px 20px;              /* Internal spacing */
+    margin: 10px;                    /* Space around buttons */
+    border: none;                    /* Remove default border */
+    border-radius: 5px;              /* Rounded corners */
+    font-size: 16px;                 /* Readable text size */
+    cursor: pointer;                 /* Hand cursor on hover */
+    display: flex;                   /* Enable flexbox for content alignment */
 }
 
 .register-button-div {
