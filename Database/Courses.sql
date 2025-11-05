@@ -20,18 +20,11 @@ END$$
 
 DELIMITER ;
 
-INSERT INTO Courses (Course_name) VALUES ('Math');
-INSERT INTO Courses (Course_name) VALUES ('Science');
-INSERT INTO Courses (Course_name) VALUES ('History');
+
+INSERT INTO Courses (Course_name) VALUES ('Computer And Information Technology');
 INSERT INTO Courses (Course_name) VALUES ('Computer Science');
-INSERT INTO Courses (Course_name) VALUES ('English');
-INSERT INTO Courses (Course_name) VALUES ('Biology');
+INSERT INTO Courses (Course_name) VALUES ('CISCO');
+INSERT INTO Courses (Course_name) VALUES ('Graphic Information Systems');
 
-INSERT INTO Courses (Course_name) VALUES ('Art');
-INSERT INTO Courses (Course_name) VALUES ('Psychology');
-INSERT INTO Courses (Course_name) VALUES ('Accounting');
-INSERT INTO Courses (Course_name) VALUES ('Economics');
 
-UPDATE Courses
-SET Course_name = 'Chemistry'
-WHERE Course_ID = 'C002'
+

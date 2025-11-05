@@ -5,7 +5,8 @@ CREATE TABLE Exams (
   Exam_Date     DATE NOT NULL,
   Exam_Time     TIME NOT NULL,
   Duration_MIN INT NOT NULL,
-  Exam_Location VARCHAR(100) NOT NULL,
+  Exam_Campus VARCHAR(20) NOT NULL,
+  Exam_Building VARCHAR(10) NOT NULL,
   Capacity      INT  NOT NULL DEFAULT 20,
   FOREIGN KEY (Course_ID) REFERENCES Courses(Course_ID)
 );
@@ -24,33 +25,79 @@ BEGIN
 END$$
 DELIMITER ;
 
-
-SET SQL_SAFE_UPDATES = 0;
-DELETE FROM Exams;
-
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C001', 'MATH 101', '2025-12-18', '09:00:00', 90, 'North', 'A103');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C001', 'MATH 102', '2025-12-18', '12:30:00', 90, 'South', 'C201');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C001', 'MATH 103', '2025-12-18', '15:00:00', 90, 'Henderson', 'A201');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C001', 'MATH 104', '2025-12-20', '09:00:00', 90, 'North', 'A103');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C001', 'MATH 105', '2025-12-20', '12:30:00', 90, 'South', 'C201');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C001', 'MATH 106', '2025-12-20', '15:30:00', 90, 'Henderson', 'A201');
+ALTER TABLE Exams ADD UNIQUE KEY uq_exam_slot (Exam_Date, Exam_Time, Exam_Campus, Exam_Building);
 
 
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C002', 'CHEM 101', '2025-12-18', '10:00:00', 90, 'North', 'A105');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C002', 'CHEM 102', '2025-12-18', '13:30:00', 90, 'South', 'B105');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C002', 'CHEM 103', '2025-12-18', '15:30:00', 90, 'Henderson', 'C101');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C002', 'CHEM 104', '2025-12-20', '13:00:00', 90, 'North', 'A105');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C002', 'CHEM 105', '2025-12-20', '13:30:00', 90, 'South', 'B105');
-INSERT INTO Exams (course_id, exam_name, exam_date, exam_time, duration_min, exam_campus, exam_building)
-VALUES ('C002', 'CHEM 106', '2025-12-20', '15:30:00', 90, 'Henderson', 'C101');
+INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Duration_MIN) VALUES
+-- ========= C001 – CIT 129 (dates: 12/08 09:30, 12/11 14:00, 12/12 15:00) =========
+('C001','CIT 129','2025-12-08','08:00:00','North','C101',90),
+('C001','CIT 129','2025-12-08','08:00:00','West','C105',90),
+('C001','CIT 129','2025-12-08','08:00:00','Henderson','C114',90),
+('C001','CIT 129','2025-12-10','11:00:00','North','C101',90),
+('C001','CIT 129','2025-12-10','11:00:00','West','C105',90),
+('C001','CIT 129','2025-12-10','11:00:00','Henderson','C114',90),
+('C001','CIT 129','2025-12-12','14:00:00','North','C101',90),
+('C001','CIT 129','2025-12-12','14:00:00','West','C105',90),
+('C001','CIT 129','2025-12-12','14:00:00','Henderson','C114',90);
+
+-- ========= C001 – CIT 130 (dates: 12/08 09:30, 12/11 14:00, 12/12 15:00) =========
+INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Duration_MIN) VALUES
+('C001','CIT 130','2025-12-08','09:30:00','North','C107',90),
+('C001','CIT 130','2025-12-08','09:30:00','West','C109',90),
+('C001','CIT 130','2025-12-08','09:30:00','Henderson','C111',90),
+('C001','CIT 130','2025-12-11','14:00:00','North','C107',90),
+('C001','CIT 130','2025-12-11','14:00:00','West','C109',90),
+('C001','CIT 130','2025-12-11','14:00:00','Henderson','C111',90),
+('C001','CIT 130','2025-12-12','15:00:00','North','C107',90),
+('C001','CIT 130','2025-12-12','15:00:00','West','C109',90),
+('C001','CIT 130','2025-12-12','15:00:00','Henderson','C111',90);
+
+ -- ========= C001 – CIT 131 (dates: 12/09 14:00, 12/11 08:00, 12/12 09:30) =========
+INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Duration_MIN) VALUES
+('C002','CIT 131','2025-12-09','14:00:00','North','C201',90),
+('C002','CIT 131','2025-12-09','14:00:00','West','C211',90),
+('C002','CIT 131','2025-12-09','14:00:00','Henderson','C207',90),
+('C002','CIT 131','2025-12-11','08:00:00','North','C201',90),
+('C002','CIT 131','2025-12-11','08:00:00','West','C211',90),
+('C002','CIT 131','2025-12-11','08:00:00','Henderson','C207',90),
+('C002','CIT 131','2025-12-12','09:30:00','North','C201',90),
+('C002','CIT 131','2025-12-12','09:30:00','West','C211',90),
+('C002','CIT 131','2025-12-12','09:30:00','Henderson','C207',90);
+
+-- ========= C002 – CS 135 (dates: 12/09 12:30, 12/10 14:00, 12/12 08:00) =========
+INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Duration_MIN) VALUES
+('C001','CS 135','2025-12-09','12:30:00','North','C118',90),
+('C001','CS 135','2025-12-09','12:30:00','West','C117',90),
+('C001','CS 135','2025-12-09','12:30:00','Henderson','C205',90),
+('C001','CS 135','2025-12-10','14:00:00','North','C118',90),
+('C001','CS 135','2025-12-10','14:00:00','West','C117',90),
+('C001','CS 135','2025-12-10','14:00:00','Henderson','C205',90),
+('C001','CS 135','2025-12-12','08:00:00','North','C118',90),
+('C001','CS 135','2025-12-12','08:00:00','West','C117',90),
+('C001','CS 135','2025-12-12','08:00:00','Henderson','C205',90);
+
+
+-- ========= C003 – CSCO 120 (dates: 12/08 14:00, 12/10 08:00, 12/11 09:30) =========
+INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Duration_MIN) VALUES
+('C003','CSCO 120','2025-12-08','14:00:00','North','C101',90),
+('C003','CSCO 120','2025-12-08','14:00:00','West','C105',90),
+('C003','CSCO 120','2025-12-08','14:00:00','Henderson','C114',90),
+('C003','CSCO 120','2025-12-10','08:00:00','North','C101',90),
+('C003','CSCO 120','2025-12-10','08:00:00','West','C105',90),
+('C003','CSCO 120','2025-12-10','08:00:00','Henderson','C114',90),
+('C003','CSCO 120','2025-12-11','09:30:00','North','C101',90),
+('C003','CSCO 120','2025-12-11','09:30:00','West','C105',90),
+('C003','CSCO 120','2025-12-11','09:30:00','Henderson','C114',90);
+
+-- ========= C004 – GRC 101 (dates: 12/08 15:00, 12/09 08:00, 12/10 09:30) =========
+INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Duration_MIN) VALUES
+('C004','GRC 101','2025-12-08','15:00:00','North','C107',90),
+('C004','GRC 101','2025-12-08','15:00:00','West','C109',90),
+('C004','GRC 101','2025-12-08','15:00:00','Henderson','C111',90),
+('C004','GRC 101','2025-12-09','08:00:00','North','C107',90),
+('C004','GRC 101','2025-12-09','08:00:00','West','C109',90),
+('C004','GRC 101','2025-12-09','08:00:00','Henderson','C111',90),
+('C004','GRC 101','2025-12-10','09:30:00','North','C107',90),
+('C004','GRC 101','2025-12-10','09:30:00','West','C109',90),
+('C004','GRC 101','2025-12-10','09:30:00','Henderson','C111',90);
+
