@@ -4,32 +4,11 @@ from flask import redirect
 from flask import request
 from flask import render_template
 from flask import session
+from flask import flash
 from markupsafe import escape
 from flaskext.mysql import MySQL
 from email_validator import validate_email, EmailNotValidError
-########################################################################
-# NOTE(S) FOR THIS PYTHON CODE:
-# TO RUN THE WHOLE PROGRAM USE "flask --debug --app backend run" in terminal (it gets the site up and running)
-# The @app.route decorator registers a URL endpoint with the Flask app.
-#
-# - Syntax: @app.route('/path', methods=['GET','POST', ...])
-#   The decorator takes the URL path (here '/student-dash') and optional
-#   parameters such as allowed HTTP methods. If methods is omitted, the
-#   route accepts GET requests by default.
-#
-# - What it does: When a client requests '/student-dash', Flask calls the
-#   function defined directly below the decorator (the "view function").
-#   That function should return a response (HTML, redirect, JSON, etc.).
-#
-# - Note on multiple decorators: You can stack multiple @app.route lines
-#   to register the same function under different URLs or with different
-#   methods (see `login()` earlier which has multiple @app.route lines).
-#
-# - url_for: Use url_for('function_name') to build the URL for a view
-#   function (Flask uses the Python function name, not the URL string).
-#
-
-
+from markupsafe import escape
 
 app = Flask(__name__)
 
@@ -56,18 +35,9 @@ def validate_login(username, password, role):
     finally:
         cursor.close()
 
-    #update validate login to avoid cashes
-    #    (user_password, user_role) = cursor.fetchone()
-    #except:
-    #    return False
-    #finally:
-    #    cursor.close()
-    #return password == user_password and role == user_role
 
 def normalize_email(email):
-    # validate and get info
     email_info = validate_email(email, check_deliverability=False)
-    # replace with normalized form
     return email_info.normalized
 
 @app.route('/')
@@ -81,23 +51,16 @@ def login():
         try:
             username = normalize_email(username)
         except EmailNotValidError as e:
-            # email is not valid, exception message is human-readable
             msg = str(e)
             return render_template('index.html', msg=msg)
         if request.path == '/faculty-login':
             if validate_login(username, password, 'faculty'):
-                # session['loggedin'] = True
-                # session['id'] = account['id']
-                # session['username'] = account['username']
                 return redirect('/faculty-dash')
             else:
                 msg = 'Incorrect username/password!'
         else:
             if validate_login(username, password, 'student'):
                 session['user_email'] = username
-                # session['loggedin'] = True
-                # session['id'] = account['id']
-                # session['username'] = account['username']
                 return redirect('/student-dash')
             else:
                 msg = 'Incorrect username/password!'
@@ -106,54 +69,24 @@ def login():
 
 @app.route('/student-dash')
 def student_dash():
-    """
-    (this is a docstring comment)
-    Handle requests to the student dashboard page.
-    
-    This route function:
-    1. Verifies user authentication
-    2. Retrieves student information from database
-    3. Renders the student dashboard template
-    
-    Returns:
-        - Redirects to login page if user is not authenticated
-        - Renders student dashboard with personalized information if authenticated
-    """
-    
-    # Authentication check
-    # Flask's session object stores user data between requests
-    # If no user_email in session, user is not logged in
     if 'user_email' not in session:
         return redirect(url_for('login'))
     
-    # Database interaction
-    # Get a cursor for executing SQL queries
     cursor = mysql.get_db().cursor()
     try: 
-        # Query the database for student's name
-        # %s placeholder prevents SQL injection attacks
-        # session['user_email'] is passed as a parameter for security
         cursor.execute(
             'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
             (session['user_email'],)
         )
-        # fetchone() returns None if no matching user found
         row = cursor.fetchone()
     finally:
-        # Always close cursor to prevent resource leaks
         cursor.close()  
     
-    # Process student name
-    # Default to "STUDENT" if database query returns no results
     student_name = "STUDENT"
     if row:
-        # Unpack the database result tuple into variables
         first_name, last_name = row
-        # Format full name in uppercase for display
         student_name = f"{first_name} {last_name}".upper()
 
-    # Render the dashboard template
-    # Pass student_name to template where it can be displayed using {{ student_name }}
     return render_template('student-dash.html', student_name=student_name)
     
 
@@ -218,6 +151,67 @@ def register():
             return redirect('/faculty-dash')
 
     return render_template('registration.html')
+
+# convert SQL rows to dicts
+def _rows_to_dicts(cursor, rows):
+    cols = [d[0] for d in cursor.description]
+    return [{cols[i]: r[i] for i in range(len(cols))} for r in rows]
+
+
+# Route for scheduling page
+@app.route('/schedule', methods=['GET', 'POST'])
+def schedule():
+    if 'user_email' not in session:  # require login 
+        return redirect(url_for('login'))
+    
+
+    db = mysql.get_db()
+    cursor = db.cursor()
+
+    # POST: handle registration 
+    if request.method == 'POST':
+        exam_id = request.form.get('exam_id')
+        if not exam_id:
+            flash("Please select an exam.")
+            return redirect(url_for('schedule'))
+
+        db = mysql.get_db()
+        cur = db.cursor()
+        try:
+        # Atomically reserve a seat only if not full and not past date
+            cur.execute("""
+                UPDATE Exams
+                SET Capacity = Capacity + 1
+                WHERE Exam_ID = %s
+                AND Capacity < 20
+                AND Exam_Date >= CURDATE()
+            """, (exam_id,))
+            db.commit()
+
+            if cur.rowcount == 0:
+                flash("Sorry, this exam is full or no longer available.")
+            else:
+                flash(f"Registered for exam {exam_id}!")
+        finally:
+            cur.close()
+
+        return redirect(url_for('schedule'))
+
+    # ----- GET: show table of available exams -----
+    try:
+        cursor.execute("""
+            SELECT Exam_ID, Course_ID, Exam_Name, Exam_Date, Exam_Time,
+                   Duration_MIN, Exam_Campus, Exam_Building, Capacity
+            FROM Exams
+            WHERE Exam_Date >= CURDATE()
+              AND Capacity < 20              -- hide full exams (20)
+            ORDER BY Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Exam_ID
+        """)
+        exams = _rows_to_dicts(cursor, cursor.fetchall())
+    finally:
+        cursor.close()
+
+    return render_template('schedule.html', exams=exams)
 
 
 @app.route('/logout')
