@@ -4,11 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title></title>
+  <title>Schedule Exam</title>
   <link href="../static/style.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body>
+<body class = "schedule-page">
   <div class="nav-bar" id="">
       <a href="https://www.csn.edu/">
         <img src="../static/Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
@@ -32,7 +32,65 @@
         <h6 class="nav-links">Request Info</h6> 
       </a>
   </div>
-  <h1>Schedule Exam</h1>
+
+  <div class="page-wrap">
+    <h1 class="main-title">Schedule Exam</h1>
+
+        <!-- Flash message section -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-wrap">
+          {% for m in messages %}
+            <div class="flash">{{ m }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('schedule') }}">
+      <div class="table-wrap">
+        <table class="sheet">
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th class="sortable">Exam ID <span class="arrow">↕</span></th>
+              <th class="sortable">Exam Name <span class="arrow">↕</span></th>
+              <th class="sortable">Date <span class="arrow">↕</span></th>
+              <th class="sortable">Time <span class="arrow">↕</span></th>
+              <th class="sortable">Duration (min) <span class="arrow">↕</span></th>
+              <th class="sortable">Campus <span class="arrow">↕</span></th>
+              <th class="sortable">Building <span class="arrow">↕</span></th>
+              <th class="sortable">Capacity <span class="arrow">↕</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in exams %}
+            <tr>
+              <td><input type="radio" name="exam_id" value="{{ e.Exam_ID }}" required></td>
+              <td>{{ e.Exam_ID }}</td>
+              <td>{{ e.Exam_Name }}</td>
+              <td>{{ e.Exam_Date }}</td>
+              <td>{{ e.Exam_Time }}</td>
+              <td>{{ e.Duration_MIN }}</td>
+              <td>{{ e.Exam_Campus }}</td>
+              <td>{{ e.Exam_Building }}</td>
+              <td>{{ e.Capacity }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if exams|length == 0 %}
+        <p style="text-align:center; color:gray;">No available exams at this time.</p>
+      {% endif %}
+
+      <div style="text-align:center; margin-top: 12px;">
+        <button class="apply-btn" type="submit">Register Selected Exam</button>
+      </div>
+    </form>
+  </div>
+  
   <script src="script.js"></script>
 
 </body>

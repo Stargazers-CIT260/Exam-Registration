@@ -7,7 +7,7 @@ CREATE TABLE Exams (
   Duration_MIN INT NOT NULL,
   Exam_Campus VARCHAR(20) NOT NULL,
   Exam_Building VARCHAR(10) NOT NULL,
-  Capacity      INT  NOT NULL DEFAULT 20,
+  Capacity      INT  NOT NULL DEFAULT 0,
   FOREIGN KEY (Course_ID) REFERENCES Courses(Course_ID)
 );
 
