@@ -11,6 +11,7 @@ from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape
 
 app = Flask(__name__)
+app = Flask(__name__, template_folder='../static/') # Or any other path 
 
 app.secret_key = 'supersecretkey'
 # MySQL Configuration
