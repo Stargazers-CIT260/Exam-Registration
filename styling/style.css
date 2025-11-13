@@ -55,17 +55,14 @@ body {
    3. NAVIGATION BAR STYLES
    Uses flexbox for responsive layout
    ---------------------------------------- */
-.navbar-nav {
+.navbar .navbar-expand-lg .bg-body-tertiary, .container-fluid, .collapse .navbar-collapse {
     display: flex;                    /* Enable flexbox layout */
     align-items: center;              /* Vertical center alignment */
     justify-content: space-around;    /* Spread items evenly */
     flex-wrap: flex;                  /* Allow wrapping on small screens */
     padding: 15px;
     margin: 0px;
-}
-
-.responsive-nav {
-    display: none;
+    width: 100%;
 }
 
 .nav-item {
@@ -241,15 +238,14 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: auto;
-    width: 100%;
+    gap: 30px;
+    width: 90%;
     margin: 40px;
     padding: 20px;
     border-radius: 10px;
-    grid-template-columns: 1fr 3fr;
 }
 
-.user-info {
+.user-info, .reserve-exam {
     background-color: #f4f4f4;
     text-align: left;
     padding-left: 25px;
@@ -257,22 +253,17 @@ h3 {
     padding-top: 10px;
     padding-bottom: 10px;
     border-radius: 10px;
-    height: 200px;
+    height: 300px;
     display: flex;
+    width: 100%;
     flex-direction: column;
     justify-content: center; 
+    align-content: center;
 }
 
-.reserve-exam {
-    background-color: #f4f4f4;
-    padding-left: 25px;
-    padding-right: 25px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-left: 40px;
-    margin-right: 40px;
-    border-radius: 10px;
-    height: 200px;
+.card-heading {
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .dash-block {
@@ -280,7 +271,32 @@ h3 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: auto;
+    gap: 30px;
+    padding: 20px;
+}
+
+.dash-body-text {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.course-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.select-course {
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 16px;
+    border-width: 0px;
+}
+
+.course-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .upcoming-exams {
@@ -292,7 +308,7 @@ h3 {
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    width: 100%;
+    width: 90%;
 }
 
 .exam-card {
@@ -311,6 +327,7 @@ h3 {
     justify-content: space-between;
     align-items: center;
     gap: 20px;
+    padding: 20px;
 }
 
 .exam-details {
