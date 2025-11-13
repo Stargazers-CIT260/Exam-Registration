@@ -64,6 +64,10 @@ body {
     margin: 0px;
 }
 
+.responsive-nav {
+    display: none;
+}
+
 .nav-item {
     list-style-type: none;
     text-decoration: none;
@@ -340,4 +344,10 @@ h3 {
 
 .error-msg {
     color: red;
+}
+
+@media (max-width: 500px) {
+    responsive-nav {
+        display: flex;
+    }
 }
