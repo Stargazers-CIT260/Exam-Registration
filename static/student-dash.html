@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>CSN Exam Registration</title>
+    <link rel="stylesheet" href="../styling/style.css" />
+    <script defer src="../script.js"></script>
+    <link rel="icon" href="../Assets/CSN-logo.PNG"/>
+</head>
+
+<body>
+    <nav class="navbar bg-body-tertiary">
+      <div class="container-fluid">
+        <ul class="navbar-nav">
+          <a class="navbar-brand" href="https://www.csn.edu/">
+            <img src="../styling/Assets/CSN-logo.PNG" alt="Logo" height="80px" class="d-inline-block align-text-top">
+          </a>
+          <li class="nav-item">
+            <a class="nav-link" href="https://enroll.csn.edu/">Areas of Interest</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://www.csn.edu/giving">Give</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://www.csn.edu/apply">Apply</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://www.csn.edu/admissions/visit">Visit</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://my.csn.edu/en-US/csn-rfi/">Request Info</a>
+        </li>
+      </ul>
+        </a>
+      </div>
+    </nav>
+  <div class="student-dashboard-content">
+    <div class="dashboard-header">
+      <h1>Welcome, {{ student_name }}</h1>
+      <h2>to your Student Dashboard</h2>
+      <!-- Replace [Student Name] with dynamic content -->
+      <div class="dash-inline">
+        <div class="user-info">
+          <h4>Email: {{ student_email }}</h4>
+          <h4>Phone Number: {{ student_number }}</h4>
+          <h4>Student ID: {{ student_id }}</h4> 
+        </div>
+        <div class="reserve-exam">
+          <h3>Register for an Exam</h3>
+            <div class="dash-block">
+              <form>
+                <dropdown>
+                  <label for="course-select">Select Course:</label>
+                  <select id="course-select" name="courses">
+                    <option value="course1">Course 1</option>
+                    <option value="course2">Course 2</option>
+                    <option value="course3">Course 3</option>
+                  </select>
+              </form>
+              <button href="schedule.html" class="schedule-button">Schedule Exam</a>
+            </div>
+        </div>
+      </div>
+    <div class="upcoming-exams">
+      <h2>Upcoming Exams</h2>
+      <!-- Placeholder for upcoming exams, shouldn't show up unless exam has been registered -->
+      <div class="exam-card">
+      <div class="exam-heading">
+        <h4>Exam 1</h4>
+        <button class="reschedule-button">Reschedule</button>
+        <button class="cancel-button">Cancel</button>
+      </div>
+      <div class="exam-details">
+        <p>Date: MM/DD/YYYY</p>
+        <p>Time: HH:MM AM/PM</p>
+        <p>Location: Building/Room</p>
+      </div>
+      </div>
+      <div class="exam-card">
+        <div class="exam-heading">
+        <h4>Exam 1</h4>
+        <button class="reschedule-button">Reschedule</button>
+        <button class="cancel-button">Cancel</button>
+        </div>
+      <div class="exam-details">
+        <p>Date: MM/DD/YYYY</p>
+        <p>Time: HH:MM AM/PM</p>
+        <p>Location: Building/Room</p>
+      </div>
+      </div>
+      <div class="exam-card">
+        <div class="exam-heading">
+        <h4>Exam 2</h4>
+        <button class="reschedule-button">Reschedule</button>
+        <button class="cancel-button">Cancel</button>
+        </div>
+      <div class="exam-details">
+        <p>Date: MM/DD/YYYY</p>
+        <p>Time: HH:MM AM/PM</p>
+        <p>Location: Building/Room</p>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+
+</body>
+
+</html>

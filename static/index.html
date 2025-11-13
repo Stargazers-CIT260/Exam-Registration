@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>CSN Exam Registration</title>
+    <link rel="stylesheet" href="../styling/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script defer src="../script.js"></script>
+    <link rel="icon" href="../Assets/CSN-logo.PNG"/>
+</head>
+
+<body>
+  <div class="landing-page">
+    <nav class="navbar bg-body-tertiary">
+      <div class="container-fluid">
+        <ul class="navbar-nav"></ul>
+          <a class="navbar-brand" href="https://www.csn.edu/">
+            <img src="../styling/Assets/CSN-logo.PNG" alt="Logo" height="80px" class="d-inline-block align-text-top">
+          </a>
+          <li class="nav-item">
+            <a class="nav-link" href="https://enroll.csn.edu/">Areas of Interest</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://www.csn.edu/giving">Give</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://www.csn.edu/apply">Apply</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://www.csn.edu/admissions/visit">Visit</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://my.csn.edu/en-US/csn-rfi/">Request Info</a>
+        </li>
+      </ul>
+        </a>
+      </div>
+    </nav>
+    <div class="banner">
+      <h4 class="banner-text">
+        From Registration to Results - Exams Simplified
+      </h4>
+    </div>
+    <div class ="title-section">
+      <h2 class="sub-title">College of Southern Nevada</h2>
+      <h1 class="main-title">Exam Registration System</h1>
+    </div>
+    <div class="login-section">
+      <h3 class="login-prompt">Log In to Access Your Dashboard</h3>
+        <form class="login-form" method="post">
+          <input type="email" id="email" class="login-input" name="username" placeholder="Email" required>
+          <input type="password" id="password" class="login-input" name="password" placeholder="Password" required>
+            {% if msg %}
+            <div class="error-msg">{{ msg }}</div>
+            {% endif %}
+            <div class="submit-buttons">
+            <input type="submit" id="login-button" class="student-button" formaction="/student-login" value="STUDENT LOGIN">
+            <input type="submit" id="faculty-button" class="faculty-button" formaction="/faculty-login" value="FACULTY LOGIN">
+          </div>
+        </form>
+      <a href="/register" class="register-title">
+        <div id="register-button" class="register-button-div">
+          <button class="register-button">New User?</button>
+        </div>
+      </a>
+    </div>
+  </div>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+</body>
+
+</html>
