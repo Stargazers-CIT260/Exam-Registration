@@ -36,56 +36,42 @@
     
   	<div class="student-dashboard-content"><!-- reuse -->
       <div class="dashboard-header">
-        <h1>Welcome, [Faculty Name]</h1>
-         <!-- Replace [Faculty Name] with dynamic content -->
+        <h1>Welcome, {{ faculty_name }}</h1>
       <div class="dashboard-subheader">
         <h2>Faculty Dashboard</h2>
-        <a href="index.html" class="logout-button">Logout</a>
+        <a href="/logout" class="logout-button">Logout</a>
       </div>
       
     <!-- My Exams (list like student cards for visual consistency) -->
     <div class="upcoming-exams">
-      <h2>Scheduled Exams</h2>
-      <div class="exam-card">
-      <div class="exam-heading">
-        <h4>Exam 1</h4>
-        <button class="reschedule-button">Edit</button>
-        <button class="cancel-button">Close</button>
+      <h2>All Exams</h2>
+      
+      <!-- Sorting buttons -->
+      <div class="sort-buttons">
+        <a href="/faculty-dash?sort=date" class="sort-btn {% if sort_by == 'date' %}active{% endif %}">Sort by Date</a>
+        <a href="/faculty-dash?sort=location" class="sort-btn {% if sort_by == 'location' %}active{% endif %}">Sort by Location</a>
+        <a href="/faculty-dash?sort=name" class="sort-btn {% if sort_by == 'name' %}active{% endif %}">Sort by Exam Name</a>
       </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-        <p>Capacity: 18 / 30</p>
-      </div>
-      </div>
-      <div class="exam-card">
-        <div class="exam-heading">
-        <h4>Exam 1</h4>
-        <button class="reschedule-button">Edit</button>
-        <button class="cancel-button">Close</button>
+      
+      {% if exams %}
+        {% for exam in exams %}
+        <div class="exam-card">
+          <div class="exam-heading">
+            <h4>{{ exam.Exam_Name }}</h4>
+          </div>
+          <div class="exam-details">
+            <p>Date: {{ exam.Exam_Date }}</p>
+            <p>Time: {{ exam.Exam_Time }}</p>
+            <p>Location: {{ exam.Exam_Campus }}, {{ exam.Exam_Building }}</p>
+            <p>Duration: {{ exam.Duration_MIN }} minutes</p>
+            <p>Current Capacity: {{ exam.Capacity }}</p>
+          </div>
         </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-        <p>Capacity: 18 / 30</p>
-      </div>
-      </div>
-      <div class="exam-card">
-        <div class="exam-heading">
-        <h4>Exam 2</h4>
-        <button class="reschedule-button">Edit</button>
-        <button class="cancel-button">Close</button>
-        </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-        <p>Capacity: 18 / 30</p>
-      </div>
+        {% endfor %}
+      {% else %}
+        <p>No exams scheduled.</p>
+      {% endif %}
     </div>
-  </div>
         
   <script src="script.js"></script>
 
