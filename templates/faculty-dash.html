@@ -50,7 +50,16 @@
       <div class="sort-buttons">
         <a href="/faculty-dash?sort=date" class="sort-btn {% if sort_by == 'date' %}active{% endif %}">Sort by Date</a>
         <a href="/faculty-dash?sort=location" class="sort-btn {% if sort_by == 'location' %}active{% endif %}">Sort by Location</a>
-        <a href="/faculty-dash?sort=name" class="sort-btn {% if sort_by == 'name' %}active{% endif %}">Sort by Exam Name</a>
+        <!-- Dropdown to pick individual exam names -->
+        <form method="get" action="/faculty-dash" style="display:inline-block; margin-left:8px;">
+          <input type="hidden" name="sort" value="name">
+          <select name="exam" id="exam-select" onchange="this.form.submit()">
+            <option value="" {% if not selected_exam %}selected{% endif %}>All Exam Names</option>
+            {% for name in exam_names %}
+              <option value="{{ name }}" {% if selected_exam == name %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </form>
       </div>
       
       {% if exams %}

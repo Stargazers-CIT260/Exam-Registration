@@ -57,12 +57,14 @@ def login():
         if request.path == '/faculty-login':
             if validate_login(username, password, 'faculty'):
                 session['user_email'] = username
+                session['user_role'] = 'faculty'
                 return redirect('/faculty-dash')
             else:
                 msg = 'Incorrect username/password!'
         else:
             if validate_login(username, password, 'student'):
                 session['user_email'] = username
+                session['user_role'] = 'student'
                 return redirect('/student-dash')
             else:
                 msg = 'Incorrect username/password!'
@@ -100,7 +102,7 @@ def faculty_dash():
     cursor = mysql.get_db().cursor()
     try: 
         cursor.execute(
-            'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
+            'SELECT First_Name, Last_Name, Role FROM Users WHERE Email = %s',
             (session['user_email'],)
         )
         row = cursor.fetchone()
@@ -108,12 +110,29 @@ def faculty_dash():
         cursor.close()  
     
     faculty_name = "FACULTY"
+    user_role = None
     if row:
-        first_name, last_name = row
+        first_name, last_name, user_role = row
         faculty_name = f"{first_name} {last_name}".upper()
+
+    # Deny access if signed-in user is not faculty
+    if user_role != 'faculty':
+        # If they are a logged-in student, redirect to student dashboard; otherwise send to login
+        if user_role == 'student':
+            return redirect(url_for('student_dash'))
+        return redirect(url_for('login'))
     
+    # Provide list of distinct exam names for the dropdown
+    cursor = mysql.get_db().cursor()
+    try:
+        cursor.execute("SELECT DISTINCT Exam_Name FROM Exams ORDER BY Exam_Name")
+        exam_names = [r[0] for r in cursor.fetchall()]
+    finally:
+        cursor.close()
+
     # Fetch all exams from the database with sorting (so that they can be displayed on faculty page)
     sort_by = request.args.get('sort', 'date')  # default sort by date
+    selected_exam = request.args.get('exam', None)
     cursor = mysql.get_db().cursor()
     try:
         if sort_by == 'location':
@@ -124,12 +143,21 @@ def faculty_dash():
                 ORDER BY Exam_Campus, Exam_Building, Exam_Date, Exam_Time
             """)
         elif sort_by == 'name':
-            cursor.execute("""
-                SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
-                       Exam_Campus, Exam_Building, Duration_MIN, Capacity
-                FROM Exams
-                ORDER BY Exam_Name, Exam_Date, Exam_Time
-            """)
+            if selected_exam:
+                cursor.execute("""
+                    SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
+                           Exam_Campus, Exam_Building, Duration_MIN, Capacity
+                    FROM Exams
+                    WHERE Exam_Name = %s
+                    ORDER BY Exam_Date, Exam_Time
+                """, (selected_exam,))
+            else:
+                cursor.execute("""
+                    SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
+                           Exam_Campus, Exam_Building, Duration_MIN, Capacity
+                    FROM Exams
+                    ORDER BY Exam_Name, Exam_Date, Exam_Time
+                """)
         else:  # default to date
             cursor.execute("""
                 SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
@@ -141,7 +169,7 @@ def faculty_dash():
     finally:
         cursor.close()
 
-    return render_template('faculty-dash.html', faculty_name=faculty_name, exams=exams, sort_by=sort_by)
+    return render_template('faculty-dash.html', faculty_name=faculty_name, exams=exams, sort_by=sort_by, exam_names=exam_names, selected_exam=selected_exam)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
