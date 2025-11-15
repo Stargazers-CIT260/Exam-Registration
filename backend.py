@@ -71,28 +71,7 @@ def login():
     return render_template('index.html', msg=msg)
 
 
-@app.route('/student-dash')
-def student_dash():
-    if 'user_email' not in session:
-        return redirect(url_for('login'))
-    
-    cursor = mysql.get_db().cursor()
-    try: 
-        cursor.execute(
-            'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
-            (session['user_email'],)
-        )
-        row = cursor.fetchone()
-    finally:
-        cursor.close()  
-    
-    student_name = "STUDENT"
-    if row:
-        first_name, last_name = row
-        student_name = f"{first_name} {last_name}".upper()
 
-    return render_template('student-dash.html', student_name=student_name)
-    
 #faculty dashboard route
 @app.route('/faculty-dash')
 def faculty_dash():
@@ -252,10 +231,6 @@ def student_dash():
 
     return render_template('student-dash.html', student_name=student_name)
     
-
-@app.route('/faculty-dash')
-def faculty_dash():
-    return render_template('faculty-dash.html')
 
 
 # convert SQL rows to dicts
