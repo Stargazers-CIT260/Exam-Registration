@@ -359,6 +359,114 @@ h3 {
     align-items: center;
 }
 
+/* Schedule Page Styles */
+
+body.schedule-page {
+    background-color: #f4f4f4;
+}
+
+.schedule-page .page-wrap {
+    max-width: 1100px;
+    margin: 24px auto 40px;
+    padding: 0 16px 32px;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.schedule-page .main-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Flash Message */
+.schedule-page .flash-wrap {
+    margin-bottom: 12px;
+}
+
+.schedule-page .flash {
+    background-color: #ff0000d5;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.schedule-page .table-wrap {
+    margin-top: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0,0.08);
+    overflow-x: auto;
+}
+
+/* Table Styles*/
+.schedule-page .sheet {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 850;
+}
+
+.schedule-page .sheet thead {
+    background-color: #004890;
+    color: #fff;
+}
+
+.schedule-page .sheet th,
+.schedule-page .sheet td {
+    padding: 10px 12px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.schedule-page .sheet th:first-child,
+.schedule-page .sheet td:first-child {
+    width: 55px;
+    text-align: center;
+}
+
+.schedule-page .sheet th + th,
+.schedule-page .sheet td, td {
+    border-left: 1px solid #e5e5e5;
+}
+
+.schedule-page .sheet tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+.schedule-page .sheet tbody tr:hover {
+    background-color: #bbd8fa;
+}
+
+.schedule-page .sheet th.sortable {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.schedule-page .sheet th .arrow {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* register button – match other dashboard buttons */
+.apply-btn,
+.schedule-button, .logout-button, .reschedule-button, .cancel-button {
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.apply-btn:hover,
+.schedule-button:hover, .logout-button:hover, .reschedule-button:hover, .cancel-button:hover {
+    background-color: #004890;
+    color: white;
+}
+
 .error-msg {
     color: red;
 }
