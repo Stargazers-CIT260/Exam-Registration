@@ -76,6 +76,7 @@
       </div>
       
       {% if exams %}
+      <!-- Printing out the info for every exam -->
         {% for exam in exams %}
         <div class="exam-card">
           <div class="exam-heading">
@@ -87,6 +88,15 @@
             <p>Location: {{ exam.Exam_Campus }}, {{ exam.Exam_Building }}</p>
             <p>Duration: {{ exam.Duration_MIN }} minutes</p>
             <p>Current Capacity: {{ exam.Capacity }}</p>
+            <!-- Students Enrolled TEMP new CODE-->
+            <p>Students Enrolled:</p>
+            <ul>
+              {% for student in exam.students %}
+                <li>{{ student }}</li>
+              {% else %}
+                <li>No students registered yet.</li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
         {% endfor %}

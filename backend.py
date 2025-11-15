@@ -147,6 +147,28 @@ def faculty_dash():
         exams = _rows_to_dicts(cursor, cursor.fetchall())
     finally:
         cursor.close()
+     # NEW: Fetch all registrations with student names
+    cursor = mysql.get_db().cursor()
+    try:
+        cursor.execute("""
+            SELECT r.Exam_ID, u.First_Name, u.Last_Name
+            FROM Registrations r
+            JOIN Users u ON r.Student_Email = u.Email
+        """)
+        registrations = cursor.fetchall()
+    finally:
+        cursor.close()
+
+    # Build mapping exam_id → list of student names
+    exam_students = {}
+    for exam_id, first, last in registrations:
+        exam_students.setdefault(exam_id, []).append(f"{first} {last}")
+
+    # Attach student list to each exam dictionary
+    for exam in exams:
+        exam_id = exam['Exam_ID']
+        exam['students'] = exam_students.get(exam_id, [])
+
 
     return render_template('faculty-dash.html', faculty_name=faculty_name, exams=exams, sort_by=sort_by, exam_names=exam_names, selected_exam=selected_exam)
 
