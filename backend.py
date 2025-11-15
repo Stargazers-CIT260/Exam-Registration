@@ -10,6 +10,7 @@ from flaskext.mysql import MySQL
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape
 
+#Command to run: flask --debug --app backend run
 app = Flask(__name__)
 
 app.secret_key = 'supersecretkey'
@@ -55,16 +56,120 @@ def login():
             return render_template('index.html', msg=msg)
         if request.path == '/faculty-login':
             if validate_login(username, password, 'faculty'):
+                session['user_email'] = username
+                session['user_role'] = 'faculty'
                 return redirect('/faculty-dash')
             else:
                 msg = 'Incorrect username/password!'
         else:
             if validate_login(username, password, 'student'):
                 session['user_email'] = username
+                session['user_role'] = 'student'
                 return redirect('/student-dash')
             else:
                 msg = 'Incorrect username/password!'
     return render_template('index.html', msg=msg)
+
+
+@app.route('/student-dash')
+def student_dash():
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    
+    cursor = mysql.get_db().cursor()
+    try: 
+        cursor.execute(
+            'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
+            (session['user_email'],)
+        )
+        row = cursor.fetchone()
+    finally:
+        cursor.close()  
+    
+    student_name = "STUDENT"
+    if row:
+        first_name, last_name = row
+        student_name = f"{first_name} {last_name}".upper()
+
+    return render_template('student-dash.html', student_name=student_name)
+    
+#faculty dashboard route
+@app.route('/faculty-dash')
+def faculty_dash():
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    
+    cursor = mysql.get_db().cursor()
+    try: 
+        cursor.execute(
+            'SELECT First_Name, Last_Name, Role FROM Users WHERE Email = %s',
+            (session['user_email'],)
+        )
+        row = cursor.fetchone()
+    finally:
+        cursor.close()  
+    
+    faculty_name = "FACULTY"
+    user_role = None
+    if row:
+        first_name, last_name, user_role = row
+        faculty_name = f"{first_name} {last_name}".upper()
+
+    # Deny access if signed-in user is not faculty
+    if user_role != 'faculty':
+        # If they are a logged-in student, redirect to student dashboard; otherwise send to login
+        if user_role == 'student':
+            return redirect(url_for('student_dash'))
+        return redirect(url_for('login'))
+    
+    # Provide list of distinct exam names for the dropdown
+    cursor = mysql.get_db().cursor()
+    try:
+        cursor.execute("SELECT DISTINCT Exam_Name FROM Exams ORDER BY Exam_Name")
+        exam_names = [r[0] for r in cursor.fetchall()]
+    finally:
+        cursor.close()
+
+    # Fetch all exams from the database with sorting (so that they can be displayed on faculty page)
+    sort_by = request.args.get('sort', 'date')  # default sort by date
+    selected_exam = request.args.get('exam', None)
+    cursor = mysql.get_db().cursor()
+    try:
+        if sort_by == 'location':
+            cursor.execute("""
+                SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
+                       Exam_Campus, Exam_Building, Duration_MIN, Capacity
+                FROM Exams
+                ORDER BY Exam_Campus, Exam_Building, Exam_Date, Exam_Time
+            """)
+        elif sort_by == 'name':
+            if selected_exam:
+                cursor.execute("""
+                    SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
+                           Exam_Campus, Exam_Building, Duration_MIN, Capacity
+                    FROM Exams
+                    WHERE Exam_Name = %s
+                    ORDER BY Exam_Date, Exam_Time
+                """, (selected_exam,))
+            else:
+                cursor.execute("""
+                    SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
+                           Exam_Campus, Exam_Building, Duration_MIN, Capacity
+                    FROM Exams
+                    ORDER BY Exam_Name, Exam_Date, Exam_Time
+                """)
+        else:  # default to date
+            cursor.execute("""
+                SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
+                       Exam_Campus, Exam_Building, Duration_MIN, Capacity
+                FROM Exams
+                ORDER BY Exam_Date, Exam_Time
+            """)
+        exams = _rows_to_dicts(cursor, cursor.fetchall())
+    finally:
+        cursor.close()
+
+    return render_template('faculty-dash.html', faculty_name=faculty_name, exams=exams, sort_by=sort_by, exam_names=exam_names, selected_exam=selected_exam)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
