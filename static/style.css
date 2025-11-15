@@ -46,7 +46,7 @@ body {
 .landing-page {
     background-color: #f4f4f4;
     min-height: 100vh;
-    max-height: 100vh;
+    max-height: 100%;
     padding-bottom: 15px;
     margin: 0px;
 }
@@ -55,30 +55,26 @@ body {
    3. NAVIGATION BAR STYLES
    Uses flexbox for responsive layout
    ---------------------------------------- */
-.nav-bar {
+.navbar .navbar-expand-lg .bg-body-tertiary, .container-fluid, .collapse .navbar-collapse {
     display: flex;                    /* Enable flexbox layout */
     align-items: center;              /* Vertical center alignment */
     justify-content: space-around;    /* Spread items evenly */
-    flex-wrap: wrap;                  /* Allow wrapping on small screens */
+    flex-wrap: flex;                  /* Allow wrapping on small screens */
     padding: 15px;
     margin: 0px;
+    width: 100%;
+}
+
+.nav-item {
+    list-style-type: none;
+    text-decoration: none;
 }
 
 .nav-links {
     text-decoration: none;
     color: black;
-}
-
-.csn-logo {
-    height: 50px;
-}
-
-h6 {
-    font-size: 18px
-}
-
-.csn-logo {
-    padding-right: 50px;
+    font-size: 18px;
+    font-style: bold;
 }
 
 .banner {
@@ -166,6 +162,10 @@ h3 {
     cursor: pointer;                 /* Hand cursor on hover */
     display: flex;                   /* Enable flexbox for content alignment */
 }
+.student-button:hover, .faculty-button:hover {
+    background-color: #004890;
+    color: white;
+}
 
 .register-button-div {
     display: flex;
@@ -174,7 +174,7 @@ h3 {
 }
 
 .register-button {
-    background-color: #004890;
+    background-color: gray;
     color: white;
     border: none;
     border-radius: 5px;
@@ -188,6 +188,11 @@ h3 {
     padding: 10px;
     width: 272px;
     font-size: 16px;
+}
+
+.register-button:hover {
+    background-color: #004890;
+    color: white;
 }
 
 .register-title {
@@ -204,6 +209,11 @@ h3 {
     padding-right: 25px;
 }
 
+.student-button:hover, .faculty-button:hover {
+    background-color: #004890;
+    color: white;
+}
+
 /* Registration Page Styles */
 
 .registration-page-content {
@@ -218,14 +228,87 @@ h3 {
 }
 
 /* Student Dashboard Styles */
+
+.dashboard-header {
+    text-align: center;
+    padding-top: 2%;
+}
+
+.dash-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    width: 90%;
+    margin: 40px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.user-info, .reserve-exam {
+    background-color: #f4f4f4;
+    text-align: left;
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 10px;
+    height: 300px;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center; 
+    align-content: center;
+}
+
+.card-heading {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.dash-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 20px;
+}
+
+.dash-body-text {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.course-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.select-course {
+    margin-left: 10px;
+    padding: 5px;
+    font-size: 16px;
+    border-width: 0px;
+}
+
+.course-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .upcoming-exams {
     background-color: #f4f4f4;
     padding: 20px;
-    margin: 20px;
+    margin: 40px;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
+    width: 90%;
 }
 
 .exam-card {
@@ -234,8 +317,9 @@ h3 {
     padding: 15px;
     color: white;
     display: flex;
-    align-items: center;
+    align-content: center;
     flex-direction: column;
+    width: 80%;
 }
 
 .exam-heading {
@@ -243,6 +327,7 @@ h3 {
     justify-content: space-between;
     align-items: center;
     gap: 20px;
+    padding: 20px;
 }
 
 .exam-details {
@@ -263,6 +348,11 @@ h3 {
     text-decoration: none;
 }
 
+.schedule-button:hover, .logout-button:hover, .reschedule-button:hover, .cancel-button:hover {
+    background-color: #004890;
+    color: white;
+}
+
 .dashboard-subheader {
     display: flex;
     justify-content: space-around;
@@ -273,97 +363,8 @@ h3 {
     color: red;
 }
 
-/* FLASH MESSAGES (used by Flask flash())  */
-.flash-wrap {
-  margin: 12px 0;
-  display: grid;
-  gap: 8px;
-}
-.flash {
-  background: #e8f2ff;
-  border: 1px solid #b6d2ff;
-  color: #003874;
-  padding: 10px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-/* Schedule Page (spreadsheet-style) */
-.schedule-page .page-wrap {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 16px;
-}
-
-/* --- Table Layout --- */
-.schedule-page .table-wrap {
-  overflow: auto;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background: #fff;
-}
-
-.schedule-page table.sheet {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 900px;
-  background: #fff;
-}
-
-.schedule-page .sheet thead th {
-  position: sticky;
-  top: 0;
-  background: #f7f9fc;
-  z-index: 1;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 10px;
-  border-bottom: 2px solid #ccc;
-  border-right: 1px solid #e5e5e5;
-  text-align: left;
-  white-space: nowrap;
-}
-.schedule-page .sheet thead th:last-child { border-right: 0; }
-
-.schedule-page .sheet tbody td {
-  font-size: 14px;
-  padding: 10px;
-  border-top: 1px solid #eee;
-  border-right: 1px solid #f0f0f0;
-  white-space: nowrap;
-}
-.schedule-page .sheet tbody tr:nth-child(odd) { background: #fafafa; }
-.schedule-page .sheet tbody td:last-child { border-right: 0; }
-
-/* Make radios easier to click */
-.schedule-page input[type="radio"] {
-  transform: scale(1.1);
-}
-
-/* Sortable look (no JS functionality) */
-.schedule-page th.sortable {
-  cursor: pointer;  /* visual hint only */
-  user-select: none;
-}
-.schedule-page th.sortable .arrow {
-  opacity: .5;
-  margin-left: 6px;
-  font-size: 12px;
-}
-
-/* Register button */
-.schedule-page .apply-btn {
-  background: #004890;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 10px 18px;
-  font-size: 15px;
-  cursor: pointer;
-  display: inline-block;
-  margin-top: 12px;
-}
-.schedule-page .apply-btn:hover {
-  background: #003874;
+@media (max-width: 500px) {
+    responsive-nav {
+        display: flex;
+    }
 }
