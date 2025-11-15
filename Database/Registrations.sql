@@ -1,16 +1,11 @@
 CREATE TABLE Registrations (
   Registration_ID VARCHAR(12) PRIMARY KEY,      
-  User_ID         INT NOT NULL,                
+  Student_Email   VARCHAR(100) NOT NULL,                
   Exam_ID         VARCHAR(20) NOT NULL,             
   status          ENUM('active','canceled','completed','no_show')
                   NOT NULL DEFAULT 'active',
   created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   
-  CONSTRAINT fk_registrations_user
-    FOREIGN KEY (User_ID)
-    REFERENCES Users(User_ID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
   
   CONSTRAINT fk_registrations_exam
     FOREIGN KEY (Exam_ID)
@@ -18,7 +13,7 @@ CREATE TABLE Registrations (
     ON DELETE CASCADE
     ON UPDATE CASCADE,
     
-  CONSTRAINT uq_no_duplicate UNIQUE (User_ID, Exam_ID)    -- no double-booking same exam 
+  CONSTRAINT uq_no_duplicate UNIQUE (Student_Email, Exam_ID)    -- no double-booking same exam 
 );
 
 DELIMITER $$

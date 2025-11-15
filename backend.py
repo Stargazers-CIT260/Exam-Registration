@@ -229,6 +229,35 @@ def register():
 
     return render_template('registration.html')
 
+
+@app.route('/student-dash')
+def student_dash():
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    
+    cursor = mysql.get_db().cursor()
+    try: 
+        cursor.execute(
+            'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
+            (session['user_email'],)
+        )
+        row = cursor.fetchone()
+    finally:
+        cursor.close()  
+    
+    student_name = "STUDENT"
+    if row:
+        first_name, last_name = row
+        student_name = f"{first_name} {last_name}".upper()
+
+    return render_template('student-dash.html', student_name=student_name)
+    
+
+@app.route('/faculty-dash')
+def faculty_dash():
+    return render_template('faculty-dash.html')
+
+
 # convert SQL rows to dicts
 def _rows_to_dicts(cursor, rows):
     cols = [d[0] for d in cursor.description]
@@ -243,45 +272,74 @@ def schedule():
     
 
     db = mysql.get_db()
-    cursor = db.cursor()
 
-    # POST: handle registration 
+    # ---- POST: handle registration/ scheduling ----
     if request.method == 'POST':
         exam_id = request.form.get('exam_id')
         if not exam_id:
             flash("Please select an exam.")
             return redirect(url_for('schedule'))
+        
+        student_email = session['user_email']
 
-        db = mysql.get_db()
         cur = db.cursor()
         try:
-        # Atomically reserve a seat only if not full and not past date
+            # --- check duplicate registration ---
+            cur.execute ("""
+                SELECT 1
+                FROM Registrations
+                WHERE Student_Email = %s AND Exam_ID = %s
+                LIMIT 1
+            """, (student_email, exam_id)
+            )
+
+            if cur.fetchone():
+                flash("You are already registered for this exam.")
+                return redirect(url_for('schedule'))
+            
+        # --- Automically reserve a seat only if not full and not past date --- 
             cur.execute("""
                 UPDATE Exams
-                SET Capacity = Capacity + 1
+                    SET Capacity = Capacity + 1
                 WHERE Exam_ID = %s
-                AND Capacity < 20
-                AND Exam_Date >= CURDATE()
+                    AND Capacity < 20
+                    AND Exam_Date >= CURDATE()
             """, (exam_id,))
-            db.commit()
 
             if cur.rowcount == 0:
+                db.rollback()
                 flash("Sorry, this exam is full or no longer available.")
-            else:
-                flash(f"Registered for exam {exam_id}!")
-        finally:
+                return redirect(url_for('schedule'))
+            
+            # --- insert registraion in db ---
+            cur.execute("""
+                INSERT INTO Registrations (Student_Email, Exam_ID, status)
+                VALUES (%s, %s, 'active')
+            """, (student_email, exam_id)
+            )
+
+            db.commit()
+            flash(f"Successfully registered for exam {exam_id}!")
+
+        except Exception as e:
+            db.rollback()
+            flash("Unexpected error while scheduling. Please try again.")
+        
+        finally: 
             cur.close()
 
         return redirect(url_for('schedule'))
 
+
     # ----- GET: show table of available exams -----
+    cursor = db.cursor()
     try:
         cursor.execute("""
             SELECT Exam_ID, Course_ID, Exam_Name, Exam_Date, Exam_Time,
                    Duration_MIN, Exam_Campus, Exam_Building, Capacity
             FROM Exams
             WHERE Exam_Date >= CURDATE()
-              AND Capacity < 20              -- hide full exams (20)
+              AND Capacity < 20              
             ORDER BY Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Exam_ID
         """)
         exams = _rows_to_dicts(cursor, cursor.fetchall())

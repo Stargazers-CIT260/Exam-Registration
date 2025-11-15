@@ -1,66 +1,161 @@
+<!-- =================================================================
+     HTML SYNTAX AND STRUCTURE GUIDE (FOR LEARNING PURPOSES)
+     =================================================================
+
+     KEY HTML CONCEPTS:
+     -----------------
+     1. HTML Elements: Everything in HTML is wrapped in tags like <tag>content</tag>
+     2. Attributes: Add extra information to elements like class="name" or id="unique"
+     3. Nesting: Elements can contain other elements (parent/child relationship)
+
+     DOCUMENT STRUCTURE:
+     ------------------
+     <!DOCTYPE html>  : Tells browsers this is an HTML5 document
+     <html>          : Root element that contains all other elements
+        <head>       : Contains metadata and resource links
+                      - Meta tags (charset, viewport)
+                      - Title
+                      - CSS links
+                      - JavaScript links
+        <body>       : Contains all visible content
+                      - Text
+                      - Images
+                      - Links
+                      - Forms
+
+     COMMON CONTAINERS:
+     -----------------
+     <div>           : Generic container for grouping elements
+     <nav>           : Container for navigation elements
+     <form>          : Container for input fields
+     <section>       : Defines a section in the document
+
+     FORM ELEMENTS:
+     -------------
+     <form>          : Creates a form
+        method=""    : How to send data (get/post)
+        action=""    : Where to send data
+     
+     <input>         : Creates input fields
+        type=""      : text, password, email, submit
+        required     : Makes field mandatory
+        placeholder  : Shows hint text
+        name=""      : Identifies the field in form data
+        id=""        : Unique identifier for JavaScript/CSS
+
+     TEMPLATE SYNTAX (Jinja2):
+     ------------------------
+     {% %}           : For logic (if statements, loops)
+     {{ }}           : For displaying variables
+     
+     =================================================================
+     HTML Document Structure Explanation (THIS WILL BE THE ONLY HTML DOCUMENT THAT IS HEAVILY DOCUMENTED LIKE THIS) (SORRY IM STILL LEARNING)
+     - This is an HTML5 document used for user registration
+     - It follows standard web document structure
+     - Contains a navigation bar and registration form
+     ================================================================= -->
+
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- ===================== HEAD SECTION ===================== -->
+<!-- The head section contains setup information for the webpage -->
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title></title>
-  <link href="../static/style.css" rel="stylesheet" type="text/css" />
+    <!-- Sets up proper text encoding for international characters -->
+    <meta charset="utf-8" />
+    <!-- Makes the page mobile-friendly -->
+    <meta name="viewport" content="width=device-width" />
+    <title>CSN Exam Registration</title>
+      <!-- Links to our CSS file that controls page appearance -->
+    <link rel="stylesheet" href="../static/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+      <!-- Links to our JavaScript file for dynamic features -->
+    <script defer src="../script.js"></script>
+    <link rel="icon" href="../Assets/CSN-logo.PNG"/>
 </head>
 
+<!-- ===================== BODY SECTION ===================== -->
+<!-- The body contains all visible content -->
 <body>
-
-<div class="nav-bar" id="">
-  <!-- change links as the project progresses -->
-  <!-- Logo Section: Links to CSN homepage -->
-      <a href="https://www.csn.edu/">
-        <img src="../static/Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
-      </a>
-      <a href="https://enroll.csn.edu/" class="nav-links">
-        <h6 class="nav-links-">Areas of Interest</h6>
-      </a>
-      <a href="https://www.csn.edu/giving" class="nav-links">    
-        <h6 class="nav-links">Give</h6> 
-      </a>
-      <a href="home.html" class="nav-links">
-        <h6 class="nav-links">Login</h6> 
-      </a>
-      <a href="https://www.csn.edu/apply" class="nav-links">
-        <h6 class="nav-links">Apply</h6>
-      </a>
-      <a href="https://www.csn.edu/admissions/visit" class="nav-links">
-        <h6 class="nav-links">Visit</h6>
-      </a>
-      <a href="https://my.csn.edu/en-US/csn-rfi/" class="nav-links">
-        <h6 class="nav-links">Request Info</h6> 
-      </a>
-    </div>
-
+<!-- ===================== NAVIGATION BAR ===================== -->
+<!-- This section creates the top navigation bar -->
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.csn.edu/">
+            <img src="../static/Assets/CSN-logo.PNG" alt="Logo" height="80px" class="d-inline-block align-text-top">
+          </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://enroll.csn.edu/">Areas of Interest</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/giving">Give</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/apply">Apply</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/admissions/visit">Visit</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://my.csn.edu/en-US/csn-rfi/">Request Info</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- ===================== REGISTRATION FORM ===================== -->
+    <!-- Main container for the registration form -->
     <div class="registration-page-content">
       <h1>Account Registration</h1>
+      <!-- Form Setup:
+           - action="/register": Sends data to the /register route in backend.py
+           - method="post": Sends data securely (not visible in URL)
+           - class="registration-form": Applies CSS styling -->
       <form class="registration-form" action="/register" method="post">
-
+        <!-- First Name Input:
+             - type="text": Regular text input field
+             - required: Must be filled out
+             - placeholder: Shows helper text when empty -->
         <input type="text" id="first-name" class="login-input" name="first-name" placeholder="First Name" required>
         <input type="text" id="last-name" class="login-input" name="last-name" placeholder="Last Name" required>
         <input type="email" id="email" class="login-input" name="email" placeholder="CSN Email" required>
+        <!-- depending on .cs.edu / .student.csn.edu is what account type it is -->
         <input type="password" id="password" class="login-input" name="password" placeholder="Password" required>
         <input type="password" id="confirm-password" class="login-input" name="confirm-password" placeholder="Confirm Password" required>
-
-        {% if msg is defined and msg %}
-          <div class="error-msg">{{ msg }}</div>
+        <!-- need to add password verification, and requirements -->
+        <!-- ===================== ERROR HANDLING ===================== -->
+        <!-- Jinja2 Template Logic: Shows error messages from the backend -->
+        <!-- The {% %} syntax is for Jinja2 template logic -->
+        <!-- The {{ }} syntax displays variable content -->
+        {% if msg %}
+        <div class="error-msg">{{ msg }}</div>
         {% endif %}
 
-
+        <!-- ===================== SUBMIT BUTTON ===================== -->
+        <!-- Container for the submit button -->
         <div class="submit-buttons">
-
+          <!-- Submit button that triggers form submission -->
           <input type="submit" id="register-button" class="register-button" value="REGISTER">
         </div>
       </form>
     </div>
     
-
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <!-- Links to external JavaScript file for dynamic features -->
   <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
 
 </body>
-
+<!-- End of HTML document -->
 </html>
