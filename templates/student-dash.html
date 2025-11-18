@@ -56,7 +56,6 @@
         <div class="user-info">
           <h3 class="card-heading">Your Information:</h3>
           <p class="dash-body-text">Email: {{ student_email }}<br>
-          Phone Number: {{ student_number }}<br>
           Student ID: {{ student_id }}</p> 
         </div>
         <div class="reserve-exam">
@@ -81,42 +80,37 @@
       </div>
     <div class="upcoming-exams">
       <h2>Upcoming Exams</h2>
-      <!-- Placeholder for upcoming exams, shouldn't show up unless exam has been registered -->
-      <div class="exam-card">
-      <div class="exam-heading">
-        <h4>Exam 1</h4>
-        <button class="reschedule-button">Reschedule</button>
-        <button class="cancel-button">Cancel</button>
-      </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-      </div>
-      </div>
-      <div class="exam-card">
-        <div class="exam-heading">
-        <h4>Exam 1</h4>
-        <button class="reschedule-button">Reschedule</button>
-        <button class="cancel-button">Cancel</button>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-wrap">
+            {% for m in messages %}
+              <div class="flash">{{ m }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if message %}
+        <p style="text-align:center; color:gray;">{{ message }}</p>
+      {% else %}
+        {% for exam in exams %}
+        <div class="exam-card">
+          <div class="exam-heading">
+            <h4>{{ exam[1] }}</h4> <!-- Exam_Name -->
+            <form method="POST" action="{{ url_for('cancel_exam', exam_id=exam[0]) }}">
+              <button type="submit" class="cancel-button">Cancel</button>
+            </form>
+          </div>
+          <div class="exam-details">
+            <p>Date: {{ exam[2] }}</p>
+            <p>Time: {{ exam[3] }}</p>
+            <p>Location: {{ exam[4] }}, {{ exam[5] }}</p>
+          </div>
         </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-      </div>
-      </div>
-      <div class="exam-card">
-        <div class="exam-heading">
-        <h4>Exam 2</h4>
-        <button class="reschedule-button">Reschedule</button>
-        <button class="cancel-button">Cancel</button>
-        </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-      </div>
+        {% endfor %}
+      {% endif %}
+    </div>
     </div>
   </div>
   <script src="script.js"></script>
