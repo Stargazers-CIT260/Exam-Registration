@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Exam Confirmation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" 
+        rel="stylesheet" 
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" 
+        crossorigin="anonymous">
+
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+  <link rel="icon" 
+        href="{{ url_for('static', filename='Assets/CSN-logo.PNG') }}" 
+        class="page-icon">
+</head>
+
+<body class="confirm-page">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.csn.edu/">
+            <img src="../static/Assets/CSN-logo.PNG" alt="Logo" height="80px" class="d-inline-block align-text-top">
+          </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://enroll.csn.edu/">Areas of Interest</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/giving">Give</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/apply">Apply</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/admissions/visit">Visit</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://my.csn.edu/en-US/csn-rfi/">Request Info</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="confirm-wrap">
+        <div class="confirm-card">
+        {% if exam %}
+        <h1 class="confirm-title">Exam Registered</h1>
+        <p class="confirm-msg">
+        Successfully registered for <strong>{{ exam.id }}</strong>!
+        </p>
+        <ul class="confirm-list">
+            <li><strong>Exam:</strong> {{ exam.name }}</li>
+            <li><strong>Date:</strong> {{ exam.date }}</li>
+            <li><strong>Time:</strong> {{ exam.time }}</li>
+            <li><strong>Campus:</strong> {{ exam.campus }}</li>
+            <li><strong>Building:</strong> {{ exam.building }}</li>
+        </ul>
+        {% else %}
+        <h1 class="confirm-title">Exam Not Found</h1>
+        <p class="confirm-msg">We couldn’t find details for this exam.</p>
+        {% endif %}
+
+        <div class="confirm-actions">
+            <a href="{{ url_for('schedule') }}" class="confirm-btn">
+            Schedule Exam
+            </a>
+            <a href="{{ url_for('student_dash') }}" class="confirm-btn">
+            Dashboard
+            </a>
+        </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+          crossorigin="anonymous"></script>
+
+
+</body>
+
+
+</html>

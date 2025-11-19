@@ -56,6 +56,15 @@
       <h2 class="sub-title">College of Southern Nevada</h2>
       <h1 class="main-title">Exam Registration System</h1>
     </div>
+    <!--- Registraion success Message -->
+    {% with message = get_flashed_messages() %}
+      {% if message %}
+        <div class="flash-success">
+          {{ message[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
     <div class="login-section">
       <h3 class="login-prompt">Log In to Access Your Dashboard</h3>
         <form class="login-form" method="post">

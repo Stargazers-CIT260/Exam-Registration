@@ -255,11 +255,10 @@ def register():
             return render_template("registration.html", msg=msg)
         finally:
             cursor.close()
-
-        if role == "student":
-            return redirect("/student-dash")
-        else:
-            return redirect("/faculty-dash")
+        
+        # Success with registration
+        flash('Successfully Registered! Please Log In')
+        return redirect(url_for('login'))
 
     return render_template("registration.html")
 
@@ -409,11 +408,25 @@ def schedule():
 
             if cur.fetchone():
                 flash("You are already registered for this exam.")
-                return redirect(url_for("schedule"))
-
-            # --- Automically reserve a seat only if not full and not past date ---
-            cur.execute(
-                """
+                return redirect(url_for('schedule'))
+            
+            # ---- Max 3 classes ----
+            cur.execute("""
+                SELECT COUNT(*)
+                FROM Registrations
+                WHERE Student_Email = %s
+                    AND status = 'active'
+            """, (student_email,)
+            )
+            active_count = cur.fetchone()[0]
+            
+            if active_count >= 3:
+                flash("You can only register for up to 3 exams. "
+                      "Please cancel before scheduling another.")
+                return redirect(url_for('schedule'))
+            
+        # --- Automically reserve a seat only if not full and not past date --- 
+            cur.execute("""
                 UPDATE Exams
                     SET Capacity = Capacity + 1
                 WHERE Exam_ID = %s
@@ -437,17 +450,14 @@ def schedule():
                 (student_email, exam_id),
             )
 
+            # --- fetch exam info for popup ---
             db.commit()
-            flash(f"Successfully registered for exam {exam_id}!")
+            return redirect(url_for('exam_confirm', exam_id=exam_id))
 
         except Exception as e:
             db.rollback()
+            print("Error while Scheduling:", e)
             flash("Unexpected error while scheduling. Please try again.")
-
-        finally:
-            cur.close()
-
-        return redirect(url_for("schedule"))
 
     # ----- GET: show table of available exams -----
     cursor = db.cursor()
@@ -467,6 +477,40 @@ def schedule():
         cursor.close()
 
     return render_template("schedule.html", exams=exams)
+
+# Route for exam confirmation page
+@app.route('/schedule/confirm/<exam_id>')
+def exam_confirm(exam_id):
+    if 'user_email' not in session:
+        return redirect(url_for('login'))
+    
+    db = mysql.get_db()
+    cur = db.cursor()
+
+    try:
+        cur.execute("""
+            SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time,
+                    Exam_Campus, Exam_Building
+            FROM Exams
+            WHERE Exam_ID = %s
+        """, (exam_id,)
+        )
+        row = cur.fetchone()
+    finally:
+        cur.close()
+    
+    exam = None
+    if row:
+        exam = {
+            "id": row[0],
+            "name": row[1],
+            "date": str(row[2]),
+            "time": str(row[3]),
+            "campus": row[4],
+            "building": row[5],
+        }
+    return render_template('exam-conf.html', exam=exam)
+
 
 
 @app.route("/logout")
