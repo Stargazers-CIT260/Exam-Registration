@@ -11,24 +11,27 @@ from flaskext.mysql import MySQL
 from email_validator import validate_email, EmailNotValidError
 from markupsafe import escape
 
-#Command to run: flask --debug --app backend run
+# Command to run: flask --debug --app backend run
 app = Flask(__name__)
 
-app.secret_key = 'supersecretkey'
+app.secret_key = "supersecretkey"
 # MySQL Configuration
-app.config['MYSQL_DATABASE_HOST'] = 'tramway.proxy.rlwy.net'
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'OnqbvfzavPfTNvrbNVQCYtgAqwhOvoMN'
-app.config['MYSQL_DATABASE_DB'] = 'railway'
-app.config['MYSQL_DATABASE_PORT'] = 56717
+app.config["MYSQL_DATABASE_HOST"] = "tramway.proxy.rlwy.net"
+app.config["MYSQL_DATABASE_USER"] = "root"
+app.config["MYSQL_DATABASE_PASSWORD"] = "OnqbvfzavPfTNvrbNVQCYtgAqwhOvoMN"
+app.config["MYSQL_DATABASE_DB"] = "railway"
+app.config["MYSQL_DATABASE_PORT"] = 56717
 
 mysql = MySQL()
 mysql.init_app(app)
 
+
 def validate_login(username, password, role):
     cursor = mysql.get_db().cursor()
     try:
-        cursor.execute('SELECT Password, Role FROM Users WHERE Email = %s LIMIT 1', (username,))#update from this below
+        cursor.execute(
+            "SELECT Password, Role FROM Users WHERE Email = %s LIMIT 1", (username,)
+        )  # update from this below
         row = cursor.fetchone()
         if not row:
             return False
@@ -42,53 +45,57 @@ def normalize_email(email):
     email_info = validate_email(email, check_deliverability=False)
     return email_info.normalized
 
-@app.route('/')
-@app.route('/student-login', methods=['GET', 'POST'])
-@app.route('/faculty-login', methods=['GET', 'POST'])
+
+@app.route("/")
+@app.route("/student-login", methods=["GET", "POST"])
+@app.route("/faculty-login", methods=["GET", "POST"])
 def login():
-    msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-        username = request.form['username']
-        password = request.form['password']
+    msg = ""
+    if (
+        request.method == "POST"
+        and "username" in request.form
+        and "password" in request.form
+    ):
+        username = request.form["username"]
+        password = request.form["password"]
         try:
             username = normalize_email(username)
         except EmailNotValidError as e:
             msg = str(e)
-            return render_template('index.html', msg=msg)
-        if request.path == '/faculty-login':
-            if validate_login(username, password, 'faculty'):
-                session['user_email'] = username
-                session['user_role'] = 'faculty'
-                return redirect('/faculty-dash')
+            return render_template("index.html", msg=msg)
+        if request.path == "/faculty-login":
+            if validate_login(username, password, "faculty"):
+                session["user_email"] = username
+                session["user_role"] = "faculty"
+                return redirect("/faculty-dash")
             else:
-                msg = 'Incorrect username/password!'
+                msg = "Incorrect username/password!"
         else:
-            if validate_login(username, password, 'student'):
-                session['user_email'] = username
-                session['user_role'] = 'student'
-                return redirect('/student-dash')
+            if validate_login(username, password, "student"):
+                session["user_email"] = username
+                session["user_role"] = "student"
+                return redirect("/student-dash")
             else:
-                msg = 'Incorrect username/password!'
-    return render_template('index.html', msg=msg)
+                msg = "Incorrect username/password!"
+    return render_template("index.html", msg=msg)
 
 
-
-#faculty dashboard route
-@app.route('/faculty-dash')
+# faculty dashboard route
+@app.route("/faculty-dash")
 def faculty_dash():
-    if 'user_email' not in session:
-        return redirect(url_for('login'))
-    
+    if "user_email" not in session:
+        return redirect(url_for("login"))
+
     cursor = mysql.get_db().cursor()
-    try: 
+    try:
         cursor.execute(
-            'SELECT First_Name, Last_Name, Role FROM Users WHERE Email = %s',
-            (session['user_email'],)
+            "SELECT First_Name, Last_Name, Role FROM Users WHERE Email = %s",
+            (session["user_email"],),
         )
         row = cursor.fetchone()
     finally:
-        cursor.close()  
-    
+        cursor.close()
+
     faculty_name = "FACULTY"
     user_role = None
     if row:
@@ -96,12 +103,12 @@ def faculty_dash():
         faculty_name = f"{first_name} {last_name}".upper()
 
     # Deny access if signed-in user is not faculty
-    if user_role != 'faculty':
+    if user_role != "faculty":
         # If they are a logged-in student, redirect to student dashboard; otherwise send to login
-        if user_role == 'student':
-            return redirect(url_for('student_dash'))
-        return redirect(url_for('login'))
-    
+        if user_role == "student":
+            return redirect(url_for("student_dash"))
+        return redirect(url_for("login"))
+
     # Provide list of distinct exam names for the dropdown
     cursor = mysql.get_db().cursor()
     try:
@@ -111,51 +118,62 @@ def faculty_dash():
         cursor.close()
 
     # Fetch all exams from the database with sorting (so that they can be displayed on faculty page)
-    sort_by = request.args.get('sort', 'date')  # default sort by date
-    selected_exam = request.args.get('exam', None)
+    sort_by = request.args.get("sort", "date")  # default sort by date
+    selected_exam = request.args.get("exam", None)
     cursor = mysql.get_db().cursor()
     try:
-        if sort_by == 'location':
-            cursor.execute("""
+        if sort_by == "location":
+            cursor.execute(
+                """
                 SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
                        Exam_Campus, Exam_Building, Duration_MIN, Capacity
                 FROM Exams
                 ORDER BY Exam_Campus, Exam_Building, Exam_Date, Exam_Time
-            """)
-        elif sort_by == 'name':
+            """
+            )
+        elif sort_by == "name":
             if selected_exam:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
                            Exam_Campus, Exam_Building, Duration_MIN, Capacity
                     FROM Exams
                     WHERE Exam_Name = %s
                     ORDER BY Exam_Date, Exam_Time
-                """, (selected_exam,))
+                """,
+                    (selected_exam,),
+                )
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
                            Exam_Campus, Exam_Building, Duration_MIN, Capacity
                     FROM Exams
                     ORDER BY Exam_Name, Exam_Date, Exam_Time
-                """)
+                """
+                )
         else:  # default to date
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
                        Exam_Campus, Exam_Building, Duration_MIN, Capacity
                 FROM Exams
                 ORDER BY Exam_Date, Exam_Time
-            """)
+            """
+            )
         exams = _rows_to_dicts(cursor, cursor.fetchall())
     finally:
         cursor.close()
-     # NEW: Fetch all registrations with student names
+    # NEW: Fetch all registrations with student names
     cursor = mysql.get_db().cursor()
     try:
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT r.Exam_ID, u.First_Name, u.Last_Name
             FROM Registrations r
             JOIN Users u ON r.Student_Email = u.Email
-        """)
+        """
+        )
         registrations = cursor.fetchall()
     finally:
         cursor.close()
@@ -167,68 +185,74 @@ def faculty_dash():
 
     # Attach student list to each exam dictionary
     for exam in exams:
-        exam_id = exam['Exam_ID']
-        exam['students'] = exam_students.get(exam_id, [])
+        exam_id = exam["Exam_ID"]
+        exam["students"] = exam_students.get(exam_id, [])
+
+    return render_template(
+        "faculty-dash.html",
+        faculty_name=faculty_name,
+        exams=exams,
+        sort_by=sort_by,
+        exam_names=exam_names,
+        selected_exam=selected_exam,
+    )
 
 
-    return render_template('faculty-dash.html', faculty_name=faculty_name, exams=exams, sort_by=sort_by, exam_names=exam_names, selected_exam=selected_exam)
-
-
-@app.route('/register', methods=['GET', 'POST'])
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    msg = ''
-    if request.method == 'POST':
-        first_name = request.form['first-name']
-        last_name = request.form['last-name']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm-password']
-        role = ''
-
-        # convert names to lowercase before validation
-        first_name = first_name.strip().lower()
-        last_name = last_name.strip().lower()
-
-        if first_name == '' or last_name == '' or email == '' or password == '' or confirm_password == '':
-            msg = 'Please fill all fields'
-            return render_template('registration.html', msg=msg)
+    msg = ""
+    if request.method == "POST":
+        first_name = request.form["first-name"]
+        last_name = request.form["last-name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm-password"]
+        role = ""
+        if (
+            first_name == ""
+            or last_name == ""
+            or email == ""
+            or password == ""
+            or confirm_password == ""
+        ):
+            msg = "Please fill all fields"
+            return render_template("registration.html", msg=msg)
         if password != confirm_password:
-            msg = 'Passwords do not match'
-            return render_template('registration.html', msg=msg)
+            msg = "Passwords do not match"
+            return render_template("registration.html", msg=msg)
 
         try:
             email = normalize_email(email)
         except EmailNotValidError as e:
             # email is not valid, exception message is human-readable
             msg = str(e)
-            return render_template('registration.html', msg=msg)
-        
-        # Determine role
-        if email.endswith('@student.csn.edu'):
-            role = 'student'
-        elif email.endswith('@csn.edu'):
-            role = 'faculty'
+            return render_template("registration.html", msg=msg)
+        if email.endswith("@student.csn.edu"):
+            role = "student"
+        elif email.endswith("@csn.edu"):
+            role = "faculty"
         else:
-            msg = 'Please enter a valid CSN email address'
-            return render_template('registration.html', msg=msg)
+            msg = "Please enter a valid CSN email address"
+            return render_template("registration.html", msg=msg)
 
-        if role == 'student' and not email[:10].isnumeric():
-            msg = 'Student must use NSHE number in email'
-            return render_template('registration.html', msg=msg)
+        if role == "student" and not email[:10].isnumeric():
+            msg = "Student must use NSHE number in email"
+            return render_template("registration.html", msg=msg)
 
-        if role == 'student' and password != email[:10]:
-            msg = 'Student password must be NSHE number'
-            return render_template('registration.html', msg=msg)
+        if role == "student" and password != email[:10]:
+            msg = "Student password must be NSHE number"
+            return render_template("registration.html", msg=msg)
 
         cursor = mysql.get_db().cursor()
         try:
             cursor.execute(
-                'INSERT INTO Users (Email, First_Name, Last_name, Password, Role) VALUES (%s, %s, %s, %s, %s)',
-                (email, first_name, last_name, password, role))
+                "INSERT INTO Users (Email, First_Name, Last_name, Password, Role) VALUES (%s, %s, %s, %s, %s)",
+                (email, first_name, last_name, password, role),
+            )
             mysql.get_db().commit()
         except:
             msg = "Account already registered with that email address"
-            return render_template('registration.html', msg=msg)
+            return render_template("registration.html", msg=msg)
         finally:
             cursor.close()
         
@@ -236,31 +260,115 @@ def register():
         flash('Successfully Registered! Please Log In')
         return redirect(url_for('login'))
 
-    return render_template('registration.html')
+    return render_template("registration.html")
 
 
 @app.route('/student-dash')
 def student_dash():
-    if 'user_email' not in session:
+    if 'user_email' not in session or 'user_role' not in session:
         return redirect(url_for('login'))
-    
-    cursor = mysql.get_db().cursor()
-    try: 
-        cursor.execute(
-            'SELECT First_Name, Last_Name FROM Users WHERE Email = %s',
-            (session['user_email'],)
-        )
-        row = cursor.fetchone()
-    finally:
-        cursor.close()  
-    
-    student_name = "STUDENT"
-    if row:
-        first_name, last_name = row
-        student_name = f"{first_name} {last_name}".upper()
 
-    return render_template('student-dash.html', student_name=student_name)
-    
+    if session['user_role'] != 'student':
+        if session['user_role'] == 'faculty':
+            return redirect(url_for('faculty_dash'))
+        return redirect(url_for('login'))
+
+    student_email = session['user_email']
+    db = mysql.get_db()
+    cursor = db.cursor()
+
+    try:
+        # Fetch student info (name, email, student ID)
+        cursor.execute("""
+            SELECT First_Name, Last_Name
+            FROM Users
+            WHERE Email = %s
+        """, (student_email,))
+        row = cursor.fetchone()
+
+        student_name = "STUDENT"
+        student_id = ""
+        if row:
+            first_name, last_name = row
+            student_name = f"{first_name} {last_name}".upper()
+            student_id = student_email.split("@")[0]
+
+
+        # Fetch upcoming exams
+        cursor.execute("""
+            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Building
+            FROM Registrations r
+            JOIN Exams e ON r.Exam_ID = e.Exam_ID
+            WHERE r.Student_Email = %s
+              AND r.status = 'active'
+              AND e.Exam_Date >= CURDATE()
+            ORDER BY e.Exam_Date, e.Exam_Time
+        """, (student_email,))
+        exams_raw = cursor.fetchall()
+        exams = []
+        for exam in exams_raw:
+            exam_id, name, date, time, campus, building = exam
+
+            if isinstance(date, datetime):
+                date_str = date.strftime("%m/%d/%Y")
+            else:
+                date_str = datetime.strptime(str(date), "%Y-%m-%d").strftime("%m/%d/%Y")
+
+            if isinstance(time, datetime):
+                time_str = time.strftime("%I:%M %p")
+            else:
+                time_str = datetime.strptime(str(time), "%H:%M:%S").strftime("%I:%M %p")
+
+            exams.append((exam_id, name, date_str, time_str, campus, building))
+
+
+
+
+    finally:
+        cursor.close()
+
+    if not exams:
+        message = "NO UPCOMING EXAMS SCHEDULED"
+        return render_template('student-dash.html',
+                               student_name=student_name,
+                               student_email=student_email,
+                               student_id=student_id,
+                               exams=None,
+                               message=message)
+
+    return render_template('student-dash.html',
+                           student_name=student_name,
+                           student_email=student_email,
+                           student_id=student_id,
+                           exams=exams,
+                           message=None)
+
+@app.route('/cancel-exam/<exam_id>', methods=['POST'])
+def cancel_exam(exam_id):
+    if 'user_email' not in session or session.get('user_role') != 'student':
+        return redirect(url_for('login'))
+
+    student_email = session['user_email']
+    db = mysql.get_db()
+    cur = db.cursor()
+
+    try:
+        # Update registration status to canceled
+        cur.execute("""
+            UPDATE Registrations
+            SET status = 'canceled'
+            WHERE Student_Email = %s AND Exam_ID = %s AND status = 'active'
+        """, (student_email, exam_id))
+        db.commit()
+
+        flash("Your exam reservation has been canceled.")
+    except Exception as e:
+        db.rollback()
+        flash("Error canceling exam. Please try again.")
+    finally:
+        cur.close()
+
+    return redirect(url_for('student_dash'))
 
 # convert SQL rows to dicts
 def _rows_to_dicts(cursor, rows):
@@ -269,32 +377,33 @@ def _rows_to_dicts(cursor, rows):
 
 
 # Route for scheduling page
-@app.route('/schedule', methods=['GET', 'POST'])
+@app.route("/schedule", methods=["GET", "POST"])
 def schedule():
-    if 'user_email' not in session:  # require login 
-        return redirect(url_for('login'))
-    
+    if "user_email" not in session:  # require login
+        return redirect(url_for("login"))
 
     db = mysql.get_db()
 
     # ---- POST: handle registration/ scheduling ----
-    if request.method == 'POST':
-        exam_id = request.form.get('exam_id')
+    if request.method == "POST":
+        exam_id = request.form.get("exam_id")
         if not exam_id:
             flash("Please select an exam.")
-            return redirect(url_for('schedule'))
-        
-        student_email = session['user_email']
+            return redirect(url_for("schedule"))
+
+        student_email = session["user_email"]
 
         cur = db.cursor()
         try:
             # --- check duplicate registration ---
-            cur.execute ("""
+            cur.execute(
+                """
                 SELECT 1
                 FROM Registrations
                 WHERE Student_Email = %s AND Exam_ID = %s
                 LIMIT 1
-            """, (student_email, exam_id)
+            """,
+                (student_email, exam_id),
             )
 
             if cur.fetchone():
@@ -323,18 +432,22 @@ def schedule():
                 WHERE Exam_ID = %s
                     AND Capacity < 20
                     AND Exam_Date >= CURDATE()
-            """, (exam_id,))
+            """,
+                (exam_id,),
+            )
 
             if cur.rowcount == 0:
                 db.rollback()
                 flash("Sorry, this exam is full or no longer available.")
-                return redirect(url_for('schedule'))
-            
+                return redirect(url_for("schedule"))
+
             # --- insert registraion in db ---
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO Registrations (Student_Email, Exam_ID, status)
                 VALUES (%s, %s, 'active')
-            """, (student_email, exam_id)
+            """,
+                (student_email, exam_id),
             )
 
             # --- fetch exam info for popup ---
@@ -345,26 +458,25 @@ def schedule():
             db.rollback()
             print("Error while Scheduling:", e)
             flash("Unexpected error while scheduling. Please try again.")
-        
-        finally: 
-            cur.close()
 
     # ----- GET: show table of available exams -----
     cursor = db.cursor()
     try:
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT Exam_ID, Course_ID, Exam_Name, Exam_Date, Exam_Time,
                    Duration_MIN, Exam_Campus, Exam_Building, Capacity
             FROM Exams
             WHERE Exam_Date >= CURDATE()
               AND Capacity < 20              
             ORDER BY Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Exam_ID
-        """)
+        """
+        )
         exams = _rows_to_dicts(cursor, cursor.fetchall())
     finally:
         cursor.close()
 
-    return render_template('schedule.html', exams=exams)
+    return render_template("schedule.html", exams=exams)
 
 # Route for exam confirmation page
 @app.route('/schedule/confirm/<exam_id>')
@@ -401,10 +513,11 @@ def exam_confirm(exam_id):
 
 
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
