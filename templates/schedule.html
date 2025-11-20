@@ -49,6 +49,50 @@
 
   <div class="page-wrap">
     <h1 class="main-title">Schedule Exam</h1>
+    
+    <div class="filter-wrap">
+    <form method="GET" action="{{ url_for('schedule') }}" class="filter-form">
+      <div class="filters">
+        <div class="filter-group">
+          <label for="exam_name">Exam Name:</label>
+          <select name="exam_name" id="exam_name">
+            <option value="">All Exams</option>
+            {% for name in exam_name_options %}
+              <option value="{{ name }}" {% if exam_name_filter == name %}selected{% endif %}>
+                {{ name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="exam_date">Date:</label>
+          <select name="exam_date" id="exam_date">
+            <option value="">All Dates</option>
+            {% for d in date_options %}
+              <option value="{{ d }}" {% if date_filter == d %}selected{% endif %}>
+                {{ d }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="campus">Campus:</label>
+          <select name="campus" id="campus">
+            <option value="">All Campuses</option>
+            {% for c in campus_options %}
+              <option value="{{ c }}" {% if campus_filter == c %}selected{% endif %}>
+                {{ c }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="apply-btn filter-btn">Apply Filter</button>
+      </div>
+    </form>
+    </div>
 
         <!-- Flash message section -->
     {% with messages = get_flashed_messages() %}
@@ -67,14 +111,14 @@
           <thead>
             <tr>
               <th>Select</th>
-              <th class="sortable">Exam ID <span class="arrow">↕</span></th>
-              <th class="sortable">Exam Name <span class="arrow">↕</span></th>
-              <th class="sortable">Date <span class="arrow">↕</span></th>
-              <th class="sortable">Time <span class="arrow">↕</span></th>
-              <th class="sortable">Duration (min) <span class="arrow">↕</span></th>
-              <th class="sortable">Campus <span class="arrow">↕</span></th>
-              <th class="sortable">Building <span class="arrow">↕</span></th>
-              <th class="sortable">Capacity <span class="arrow">↕</span></th>
+              <th>Exam ID</th>
+              <th>Exam Name</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Duration (min)</th>
+              <th>Campus</th>
+              <th>Building</th>
+              <th>Capacity</th>
             </tr>
           </thead>
           <tbody>
@@ -99,8 +143,9 @@
         <p style="text-align:center; color:gray;">No available exams at this time.</p>
       {% endif %}
 
-      <div style="text-align:center; margin-top: 12px;">
+      <div class="schedule-actions">
         <button class="apply-btn" type="submit">Register Selected Exam</button>
+        <a href="{{ url_for('student_dash') }}" class="apply-btn">Go to Dashboard</a>
       </div>
     </form>
   </div>
