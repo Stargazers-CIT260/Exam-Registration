@@ -80,7 +80,73 @@ def login():
     return render_template("index.html", msg=msg)
 
 
-# faculty dashboard route
+# --- Registration page route ---
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    msg = ""
+    if request.method == "POST":
+        first_name = request.form["first-name"]
+        last_name = request.form["last-name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm-password"]
+        role = ""
+        if (
+            first_name == ""
+            or last_name == ""
+            or email == ""
+            or password == ""
+            or confirm_password == ""
+        ):
+            msg = "Please fill all fields"
+            return render_template("registration.html", msg=msg)
+        if password != confirm_password:
+            msg = "Passwords do not match"
+            return render_template("registration.html", msg=msg)
+
+        try:
+            email = normalize_email(email)
+        except EmailNotValidError as e:
+            # email is not valid, exception message is human-readable
+            msg = str(e)
+            return render_template("registration.html", msg=msg)
+        if email.endswith("@student.csn.edu"):
+            role = "student"
+        elif email.endswith("@csn.edu"):
+            role = "faculty"
+        else:
+            msg = "Please enter a valid CSN email address"
+            return render_template("registration.html", msg=msg)
+
+        if role == "student" and not email[:10].isnumeric():
+            msg = "Student must use NSHE number in email"
+            return render_template("registration.html", msg=msg)
+
+        if role == "student" and password != email[:10]:
+            msg = "Student password must be NSHE number"
+            return render_template("registration.html", msg=msg)
+
+        cursor = mysql.get_db().cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO Users (Email, First_Name, Last_name, Password, Role) VALUES (%s, %s, %s, %s, %s)",
+                (email, first_name, last_name, password, role),
+            )
+            mysql.get_db().commit()
+        except:
+            msg = "Account already registered with that email address"
+            return render_template("registration.html", msg=msg)
+        finally:
+            cursor.close()
+        
+        # Success with registration
+        flash('Successfully Registered! Please Log In')
+        return redirect(url_for('login'))
+
+    return render_template("registration.html")
+
+
+# --- faculty dashboard route ---
 @app.route("/faculty-dash")
 def faculty_dash():
     if "user_email" not in session:
@@ -198,71 +264,7 @@ def faculty_dash():
     )
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    msg = ""
-    if request.method == "POST":
-        first_name = request.form["first-name"]
-        last_name = request.form["last-name"]
-        email = request.form["email"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm-password"]
-        role = ""
-        if (
-            first_name == ""
-            or last_name == ""
-            or email == ""
-            or password == ""
-            or confirm_password == ""
-        ):
-            msg = "Please fill all fields"
-            return render_template("registration.html", msg=msg)
-        if password != confirm_password:
-            msg = "Passwords do not match"
-            return render_template("registration.html", msg=msg)
-
-        try:
-            email = normalize_email(email)
-        except EmailNotValidError as e:
-            # email is not valid, exception message is human-readable
-            msg = str(e)
-            return render_template("registration.html", msg=msg)
-        if email.endswith("@student.csn.edu"):
-            role = "student"
-        elif email.endswith("@csn.edu"):
-            role = "faculty"
-        else:
-            msg = "Please enter a valid CSN email address"
-            return render_template("registration.html", msg=msg)
-
-        if role == "student" and not email[:10].isnumeric():
-            msg = "Student must use NSHE number in email"
-            return render_template("registration.html", msg=msg)
-
-        if role == "student" and password != email[:10]:
-            msg = "Student password must be NSHE number"
-            return render_template("registration.html", msg=msg)
-
-        cursor = mysql.get_db().cursor()
-        try:
-            cursor.execute(
-                "INSERT INTO Users (Email, First_Name, Last_name, Password, Role) VALUES (%s, %s, %s, %s, %s)",
-                (email, first_name, last_name, password, role),
-            )
-            mysql.get_db().commit()
-        except:
-            msg = "Account already registered with that email address"
-            return render_template("registration.html", msg=msg)
-        finally:
-            cursor.close()
-        
-        # Success with registration
-        flash('Successfully Registered! Please Log In')
-        return redirect(url_for('login'))
-
-    return render_template("registration.html")
-
-
+# --- student dashboard route ---
 @app.route('/student-dash')
 def student_dash():
     if 'user_email' not in session or 'user_role' not in session:
@@ -343,6 +345,8 @@ def student_dash():
                            exams=exams,
                            message=None)
 
+
+# --- cancel exam route ---
 @app.route('/cancel-exam/<exam_id>', methods=['POST'])
 def cancel_exam(exam_id):
     if 'user_email' not in session or session.get('user_role') != 'student':
@@ -353,17 +357,32 @@ def cancel_exam(exam_id):
     cur = db.cursor()
 
     try:
-        # Update registration status to canceled
+        # --- make sure registraion exist and active ---
         cur.execute("""
-            UPDATE Registrations
-            SET status = 'canceled'
+            SELECT 1
+            FROM Registrations
             WHERE Student_Email = %s AND Exam_ID = %s AND status = 'active'
+            LIMIT 1
+            """, (student_email, exam_id))
+        
+        if not cur.fetchone():
+            flash("You are not registered for this exam.")
+            return redirect(url_for("student_dash"))
+        
+        # --- hard DELETE active registration row ---
+        cur.execute("""
+            DELETE FROM Registrations
+            WHERE Student_Email = %s 
+                AND Exam_ID = %s 
+                AND status = 'active'
         """, (student_email, exam_id))
-        db.commit()
 
+        db.commit()
         flash("Your exam reservation has been canceled.")
+
     except Exception as e:
         db.rollback()
+        print("Cancel Error:", e)
         flash("Error canceling exam. Please try again.")
     finally:
         cur.close()
@@ -395,19 +414,35 @@ def schedule():
 
         cur = db.cursor()
         try:
-            # --- check duplicate registration ---
+            # --- get exam name ---
+            cur.execute ("""
+                SELECT Exam_Name
+                FROM Exams
+                WHERE Exam_ID = %s
+            """, (exam_id,))
+            row = cur.fetchone()
+            if not row:
+                flash("Selected exam not found. Please try again.")
+                return redirect(url_for("schedule"))
+            
+            exam_name = row[0]
+            
+            # --- check duplicate for SAME EXAM ---
             cur.execute(
                 """
                 SELECT 1
-                FROM Registrations
-                WHERE Student_Email = %s AND Exam_ID = %s
+                FROM Registrations r
+                JOIN Exams e ON r.Exam_ID = e.Exam_ID
+                WHERE r.Student_Email = %s 
+                    AND r.status = 'active'
+                    AND e.Exam_Name = %s
                 LIMIT 1
             """,
-                (student_email, exam_id),
-            )
-
+                (student_email, exam_name))
+            
             if cur.fetchone():
-                flash("You are already registered for this exam.")
+                flash("You are already registered for same exam. "
+                      "Please cancel your existing exam before scheduling another.")
                 return redirect(url_for('schedule'))
             
             # ---- Max 3 classes ----
@@ -425,58 +460,120 @@ def schedule():
                       "Please cancel before scheduling another.")
                 return redirect(url_for('schedule'))
             
-        # --- Automically reserve a seat only if not full and not past date --- 
+            # --- check capacity based on active registration ---
             cur.execute("""
-                UPDATE Exams
-                    SET Capacity = Capacity + 1
+                SELECT COUNT(*)
+                FROM Registrations
                 WHERE Exam_ID = %s
-                    AND Capacity < 20
-                    AND Exam_Date >= CURDATE()
-            """,
-                (exam_id,),
-            )
+                    AND status = 'active'
+            """, (exam_id,))
 
-            if cur.rowcount == 0:
-                db.rollback()
-                flash("Sorry, this exam is full or no longer available.")
+            seats_taken = cur.fetchone()[0]
+            if seats_taken >=20:
+                flash("Sorry, this exam is full.")
                 return redirect(url_for("schedule"))
-
-            # --- insert registraion in db ---
+            
+            # --- Insert scheduled exam into registration row ---
             cur.execute(
                 """
                 INSERT INTO Registrations (Student_Email, Exam_ID, status)
                 VALUES (%s, %s, 'active')
-            """,
-                (student_email, exam_id),
+            """, (student_email, exam_id)
             )
 
-            # --- fetch exam info for popup ---
             db.commit()
+
+            # --- to to confirmation page ---
             return redirect(url_for('exam_confirm', exam_id=exam_id))
 
         except Exception as e:
             db.rollback()
-            print("Error while Scheduling:", e)
+            print("Error while Scheduling:", repr(e))
             flash("Unexpected error while scheduling. Please try again.")
+        
+        finally:
+            cur.close()
 
     # ----- GET: show table of available exams -----
     cursor = db.cursor()
     try:
-        cursor.execute(
-            """
-            SELECT Exam_ID, Course_ID, Exam_Name, Exam_Date, Exam_Time,
-                   Duration_MIN, Exam_Campus, Exam_Building, Capacity
-            FROM Exams
-            WHERE Exam_Date >= CURDATE()
-              AND Capacity < 20              
-            ORDER BY Exam_Date, Exam_Time, Exam_Campus, Exam_Building, Exam_ID
+        # --- filter query string ---
+        exam_name_filter = request.args.get("exam_name", "").strip()
+        date_filter = request.args.get("exam_date", "").strip()
+        campus_filter = request.args.get("campus", "").strip()
+
+        # --- dynamic WHERE clause ---
+        where_clauses = [
+            "e.Exam_Date >= CURDATE()",
+            """(
+                SELECT COUNT(*)
+                FROM Registrations r
+                WHERE r.Exam_ID = e.Exam_ID
+                    AND r.status = 'active'
+                ) < 20 """
+        ]
+        params = []
+
+        if exam_name_filter:
+            where_clauses.append("e.Exam_Name = %s")
+            params.append(exam_name_filter)
+
+        if date_filter:
+            where_clauses.append("e.Exam_Date = %s")
+            params.append(date_filter)
+        
+        if campus_filter:
+            where_clauses.append("e.Exam_Campus = %s")
+            params.append(campus_filter)
+        
+        where_sql = " AND ".join(where_clauses)
+
+        query = f"""
+            SELECT
+                e.Exam_ID,
+                e.Course_ID,
+                e.Exam_Name,
+                e.Exam_Date,
+                e.Exam_Time,
+                e.Duration_MIN,
+                e.Exam_Campus,
+                e.Exam_Building,
+                (
+                    SELECT COUNT(*)
+                    FROM Registrations r
+                    WHERE r.Exam_ID = e.Exam_ID
+                      AND r.status = 'active'
+                ) AS Capacity   -- "seats taken" shown in last column
+            FROM Exams e
+            WHERE {where_sql}
+            ORDER BY e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Building, e.Exam_ID
         """
-        )
+        
+        cursor.execute(query, tuple(params))
         exams = _rows_to_dicts(cursor, cursor.fetchall())
+
+        # --- dropdown options ---
+        cursor.execute("SELECT DISTINCT Exam_Name FROM Exams ORDER BY Exam_Name")
+        exam_name_options = [row[0] for row in cursor.fetchall()]
+
+        cursor.execute("SELECT DISTINCT Exam_Date FROM Exams ORDER BY Exam_Date")
+        date_options = [str(row[0]) for row in cursor.fetchall()]  # cast date to string
+
+        cursor.execute("SELECT DISTINCT Exam_Campus FROM Exams ORDER BY Exam_Campus")
+        campus_options = [row[0] for row in cursor.fetchall()]
+
     finally:
         cursor.close()
 
-    return render_template("schedule.html", exams=exams)
+    return render_template(
+            "schedule.html", 
+            exams=exams,
+            exam_name_filter=exam_name_filter,
+            date_filter=date_filter,
+            campus_filter=campus_filter,
+            exam_name_options=exam_name_options,
+            date_options=date_options,
+            campus_options=campus_options,)
 
 # Route for exam confirmation page
 @app.route('/schedule/confirm/<exam_id>')
@@ -510,7 +607,6 @@ def exam_confirm(exam_id):
             "building": row[5],
         }
     return render_template('exam-conf.html', exam=exam)
-
 
 
 @app.route("/logout")

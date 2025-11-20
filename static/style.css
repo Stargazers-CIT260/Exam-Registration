@@ -381,7 +381,6 @@ h3 {
 }
 
 /* Schedule Page Styles */
-
 body.schedule-page {
     background-color: #f4f4f4;
 }
@@ -412,6 +411,7 @@ body.schedule-page {
     font-size: 14px;
 }
 
+/* Table Styles*/
 .schedule-page .table-wrap {
     margin-top: 10px;
     background-color: #fff;
@@ -420,7 +420,6 @@ body.schedule-page {
     overflow-x: auto;
 }
 
-/* Table Styles*/
 .schedule-page .sheet {
     width: 100%;
     border-collapse: collapse;
@@ -469,9 +468,15 @@ body.schedule-page {
     opacity: 0.7;
 }
 
-/* register button – match other dashboard buttons */
-.apply-btn,
-.schedule-button, .logout-button, .reschedule-button, .cancel-button {
+.schedule-actions {
+    margin-top: 12px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.schedule-actions .apply-btn {
     background-color: gray;
     color: white;
     border: none;
@@ -482,8 +487,58 @@ body.schedule-page {
     text-decoration: none;
 }
 
-.apply-btn:hover,
-.schedule-button:hover, .logout-button:hover, .reschedule-button:hover, .cancel-button:hover {
+.schedule-actions .apply-btn:hover {
+    background-color: #004890;
+    color: white;
+}
+
+/* filter styles */
+.schedule-page .filter-wrap {
+    background-color: #fff;
+    border: 1.5px solid #004890;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.schedule-page .filter-form {
+    margin-bottom: 12px;
+}
+
+.schedule-page .filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.schedule-page .filter-group label {
+    display: block;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 4px;
+}
+
+.schedule-page .filter-group select {
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.schedule-page .filter-btn {
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.schedule-page .filter-btn:hover {
     background-color: #004890;
     color: white;
 }
