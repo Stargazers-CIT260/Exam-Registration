@@ -85,8 +85,8 @@ def login():
 def register():
     msg = ""
     if request.method == "POST":
-        first_name = request.form["first-name"]
-        last_name = request.form["last-name"]
+        first_name = request.form["first-name"].lower()
+        last_name = request.form["last-name"].lower()
         email = request.form["email"]
         password = request.form["password"]
         confirm_password = request.form["confirm-password"]
