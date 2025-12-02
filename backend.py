@@ -204,3 +204,13 @@ def schedule_exams():
             cursor.close()
             return render_template('student-dash.html', msg=msg)
         
+        # Student Logout
+        @app.route('/student-logout')
+        def student_logout():
+            session.pop('loggedin', None)
+            session.pop('id', None)
+            session.pop('username', None)
+            return redirect(url_for('login'))
+        
+
+        
