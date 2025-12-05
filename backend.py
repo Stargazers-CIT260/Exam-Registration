@@ -606,12 +606,14 @@ def exam_confirm(exam_id):
 
     try:
         cur.execute("""
-            SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time,
-                    Exam_Campus, Exam_Location
-            FROM Exams
-            WHERE Exam_ID = %s
-        """, (exam_id,)
-        )
+            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time,
+                   e.Exam_Campus, e.Exam_Location,
+                   CONCAT(u.First_Name, ' ', u.Last_Name) AS Proctor_Name
+            FROM Exams e
+            JOIN Users u 
+                ON e.Proctor_Email = u.Email
+            WHERE e.Exam_ID = %s
+        """, (exam_id,))
         row = cur.fetchone()
     finally:
         cur.close()
@@ -625,6 +627,7 @@ def exam_confirm(exam_id):
             "time": str(row[3]),
             "campus": row[4],
             "location": row[5],
+            "proctor": row[6],
         }
     return render_template('exam-conf.html', exam=exam)
 
