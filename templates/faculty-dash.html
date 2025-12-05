@@ -2,92 +2,113 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title></title>
-  <link href="../static/style.css" rel="stylesheet" type="text/css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>CSN Exam Registration</title>
+    <link rel="stylesheet" href="../static/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script defer src="../script.js"></script>
+    <link rel="icon" href="../static/Assets/CSN-logo.PNG"/>
 </head>
 
 <body>
-  <div class="nav-bar" id="">
-      <a href="https://www.csn.edu/">
-        <img src="../static/Assets/CSN-logo.PNG" alt="CSN Logo" class="csn-logo">
-      </a>
-      <a href="https://enroll.csn.edu/" class="nav-links">
-        <h6 class="nav-links-">Areas of Interest</h6>
-      </a>
-      <a href="https://www.csn.edu/giving" class="nav-links">    
-        <h6 class="nav-links">Give</h6> 
-      </a>
-      <a href="https://go.csn.edu/LoginPolicy.jsp" class="nav-links">
-        <h6 class="nav-links">Login</h6> 
-      </a>
-      <a href="https://www.csn.edu/apply" class="nav-links">
-        <h6 class="nav-links">Apply</h6>
-      </a>
-      <a href="https://www.csn.edu/admissions/visit" class="nav-links">
-        <h6 class="nav-links">Visit</h6>
-      </a>
-      <a href="https://my.csn.edu/en-US/csn-rfi/" class="nav-links">
-        <h6 class="nav-links">Request Info</h6> 
-      </a>
-    </div> 
-    
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="https://www.csn.edu/">
+            <img src="../static/Assets/CSN-logo.PNG" alt="Logo" height="80px" class="d-inline-block align-text-top">
+          </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <li class="nav-item">
+              <a class="nav-link" href="https://enroll.csn.edu/">Areas of Interest</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/giving">Give</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/apply">Apply</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://www.csn.edu/admissions/visit">Visit</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://my.csn.edu/en-US/csn-rfi/">Request Info</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
     
   	<div class="student-dashboard-content"><!-- reuse -->
       <div class="dashboard-header">
-        <h1>Welcome, [Faculty Name]</h1>
-         <!-- Replace [Faculty Name] with dynamic content -->
+        <h1>Welcome, {{ faculty_name }}</h1>
       <div class="dashboard-subheader">
         <h2>Faculty Dashboard</h2>
-        <a href="index.html" class="logout-button">Logout</a>
+        <a href="/logout" class="logout-button">Logout</a>
+      </div>
       </div>
       
     <!-- My Exams (list like student cards for visual consistency) -->
     <div class="upcoming-exams">
-      <h2>Scheduled Exams</h2>
-      <div class="exam-card">
-      <div class="exam-heading">
-        <h4>Exam 1</h4>
-        <button class="reschedule-button">Edit</button>
-        <button class="cancel-button">Close</button>
+      <h2>All Exams</h2>
+      
+      <!-- Sorting buttons -->
+      <div class="sort-buttons">
+        <a href="{{ url_for('faculty_dash', sort='date') }}" class="sort-btn {% if sort_by == 'date' %}active{% endif %}">Sort by Date</a>
+          <a href="{{ url_for('faculty_dash', sort='location') }}" class="sort-btn {% if sort_by == 'location' %}active{% endif %}">Sort by Location</a>
+        <!-- Dropdown to pick individual exam names -->
+        <form method="get" action="/faculty-dash" style="display:inline-block; margin-left:8px;">
+          <input type="hidden" name="sort" value="name">
+          <select name="exam" id="exam-select" onchange="this.form.submit()">
+            <option value="" {% if not selected_exam %}selected{% endif %}>All Exam Names</option>
+            {% for name in exam_names %}
+              <option value="{{ name }}" {% if selected_exam == name %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </form>
       </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-        <p>Capacity: 18 / 30</p>
-      </div>
-      </div>
-      <div class="exam-card">
-        <div class="exam-heading">
-        <h4>Exam 1</h4>
-        <button class="reschedule-button">Edit</button>
-        <button class="cancel-button">Close</button>
+      
+      {% if exams %}
+      <!-- Printing out the info for every exam -->
+        {% for exam in exams %}
+        <div class="exam-card">
+          <div class="exam-heading">
+            <h4>{{ exam.Exam_Name }}</h4>
+          </div>
+          <div class="exam-details">
+            <p>Date: {{ exam.Exam_Date }}</p>
+            <p>Time: {{ exam.Exam_Time }}</p>
+            <p>Location: {{ exam.Exam_Campus }}, {{ exam.Exam_Location}}</p>
+            <p>Duration: {{ exam.Duration_MIN }} minutes</p>
+            <p>Current Capacity: {{ exam.Capacity }}</p>
+            <!-- Students Enrolled TEMP new CODE-->
+            <p>Students Enrolled:</p>
+            <ul>
+              {% for student in exam.students %}
+                <li>{{ student }}</li>
+              {% else %}
+                <li>No students registered yet.</li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-        <p>Capacity: 18 / 30</p>
-      </div>
-      </div>
-      <div class="exam-card">
-        <div class="exam-heading">
-        <h4>Exam 2</h4>
-        <button class="reschedule-button">Edit</button>
-        <button class="cancel-button">Close</button>
-        </div>
-      <div class="exam-details">
-        <p>Date: MM/DD/YYYY</p>
-        <p>Time: HH:MM AM/PM</p>
-        <p>Location: Building/Room</p>
-        <p>Capacity: 18 / 30</p>
-      </div>
+        {% endfor %}
+      {% else %}
+        <p>No exams scheduled.</p>
+      {% endif %}
     </div>
-  </div>
+    </div>
         
   <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
 </body>
 

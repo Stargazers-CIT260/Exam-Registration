@@ -101,3 +101,48 @@ INSERT INTO Exams (Course_ID, Exam_Name, Exam_Date, Exam_Time, Exam_Campus, Exam
 ('C004','GRC 101','2025-12-10','09:30:00','West','C109',90),
 ('C004','GRC 101','2025-12-10','09:30:00','Henderson','C111',90);
 
+
+ALTER TABLE Exams
+CHANGE COLUMN Exam_Building Exam_Location varchar(10) NOT NULL;
+
+ALTER TABLE Exams
+ADD COLUMN Proctor_Email VARCHAR(100) NOT NULL AFTER Exam_Location;
+
+
+-- North: Devin for CIT 129, CIT 130, CS 135
+UPDATE Exams
+SET Proctor_Email = 'devin.ibarra@csn.edu'
+WHERE Exam_Campus = 'North'
+  AND Exam_Name IN ('CIT 129', 'CIT 130', 'CS 135');
+
+-- North: Eddie for CIT 131, CSCO 120, GRC 101
+UPDATE Exams
+SET Proctor_Email = 'eddie.ali@csn.edu'
+WHERE Exam_Campus = 'North'
+  AND Exam_Name IN ('CIT 131', 'CSCO 120', 'GRC 101');
+
+-- West: Edward for CIT 129, CIT 130, CS 135
+UPDATE Exams
+SET Proctor_Email = 'edward.hart@csn.edu'
+WHERE Exam_Campus = 'West'
+  AND Exam_Name IN ('CIT 129', 'CIT 130', 'CS 135');
+
+-- West: Jamie for CIT 131, CSCO 120, GRC 101
+UPDATE Exams
+SET Proctor_Email = 'jamie.herman@csn.edu'
+WHERE Exam_Campus = 'West'
+  AND Exam_Name IN ('CIT 131', 'CSCO 120', 'GRC 101');
+  
+  -- Henderson: Lily for CIT 129, CIT 130, CS 135
+UPDATE Exams
+SET Proctor_Email = 'lily.flores@csn.edu'
+WHERE Exam_Campus = 'Henderson'
+  AND Exam_Name IN ('CIT 129', 'CIT 130', 'CS 135');
+
+-- Henderson: Coen for CIT 131, CSCO 120, GRC 101
+UPDATE Exams
+SET Proctor_Email = 'coen.ray@csn.edu'
+WHERE Exam_Campus = 'Henderson'
+  AND Exam_Name IN ('CIT 131', 'CSCO 120', 'GRC 101');
+  
+  
