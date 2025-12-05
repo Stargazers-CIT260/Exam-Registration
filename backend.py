@@ -79,6 +79,10 @@ def login():
                 msg = "Incorrect username/password!"
     return render_template("index.html", msg=msg)
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 # --- Registration page route ---
 @app.route("/register", methods=["GET", "POST"])
@@ -620,13 +624,6 @@ def exam_confirm(exam_id):
             "location": row[5],
         }
     return render_template('exam-conf.html', exam=exam)
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
-
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
