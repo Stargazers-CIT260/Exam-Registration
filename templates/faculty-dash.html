@@ -54,6 +54,7 @@
         <h2>Faculty Dashboard</h2>
         <a href="/logout" class="logout-button">Logout</a>
       </div>
+      </div>
       
     <!-- My Exams (list like student cards for visual consistency) -->
     <div class="upcoming-exams">
@@ -61,8 +62,8 @@
       
       <!-- Sorting buttons -->
       <div class="sort-buttons">
-        <a href="/faculty-dash?sort=date" class="sort-btn {% if sort_by == 'date' %}active{% endif %}">Sort by Date</a>
-        <a href="/faculty-dash?sort=location" class="sort-btn {% if sort_by == 'location' %}active{% endif %}">Sort by Location</a>
+        <a href="{{ url_for('faculty_dash', sort='date') }}" class="sort-btn {% if sort_by == 'date' %}active{% endif %}">Sort by Date</a>
+          <a href="{{ url_for('faculty_dash', sort='location') }}" class="sort-btn {% if sort_by == 'location' %}active{% endif %}">Sort by Location</a>
         <!-- Dropdown to pick individual exam names -->
         <form method="get" action="/faculty-dash" style="display:inline-block; margin-left:8px;">
           <input type="hidden" name="sort" value="name">
@@ -85,7 +86,7 @@
           <div class="exam-details">
             <p>Date: {{ exam.Exam_Date }}</p>
             <p>Time: {{ exam.Exam_Time }}</p>
-            <p>Location: {{ exam.Exam_Campus }}, {{ exam.Exam_Building }}</p>
+            <p>Location: {{ exam.Exam_Campus }}, {{ exam.Exam_Location}}</p>
             <p>Duration: {{ exam.Duration_MIN }} minutes</p>
             <p>Current Capacity: {{ exam.Capacity }}</p>
             <!-- Students Enrolled TEMP new CODE-->
@@ -103,6 +104,7 @@
       {% else %}
         <p>No exams scheduled.</p>
       {% endif %}
+    </div>
     </div>
         
   <script src="script.js"></script>
