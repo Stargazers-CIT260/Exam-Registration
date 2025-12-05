@@ -111,13 +111,13 @@
           <thead>
             <tr>
               <th>Select</th>
-              <th>Exam ID</th>
               <th>Exam Name</th>
               <th>Date</th>
               <th>Time</th>
               <th>Duration (min)</th>
               <th>Campus</th>
-              <th>Building</th>
+              <th>Location</th>
+              <th>Proctor</th>
               <th>Capacity</th>
             </tr>
           </thead>
@@ -125,13 +125,13 @@
             {% for e in exams %}
             <tr>
               <td><input type="radio" name="exam_id" value="{{ e.Exam_ID }}" required></td>
-              <td>{{ e.Exam_ID }}</td>
               <td>{{ e.Exam_Name }}</td>
               <td>{{ e.Exam_Date }}</td>
               <td>{{ e.Exam_Time }}</td>
               <td>{{ e.Duration_MIN }}</td>
               <td>{{ e.Exam_Campus }}</td>
-              <td>{{ e.Exam_Building }}</td>
+              <td>{{ e.Exam_Location }}</td>
+              <td>{{ e.Proctor_Name | title }}</td>
               <td>{{ e.Capacity }}</td>
             </tr>
             {% endfor %}

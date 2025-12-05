@@ -152,7 +152,8 @@ def faculty_dash():
     if "user_email" not in session:
         return redirect(url_for("login"))
 
-    cursor = mysql.get_db().cursor()
+    db = mysql.get_db()
+    cursor = db.cursor()
     try:
         cursor.execute(
             "SELECT First_Name, Last_Name, Role FROM Users WHERE Email = %s",
@@ -175,10 +176,17 @@ def faculty_dash():
             return redirect(url_for("student_dash"))
         return redirect(url_for("login"))
 
-    # Provide list of distinct exam names for the dropdown
-    cursor = mysql.get_db().cursor()
+    # Provide list of exams THIS faculty proctors
+    cursor = db.cursor()
     try:
-        cursor.execute("SELECT DISTINCT Exam_Name FROM Exams ORDER BY Exam_Name")
+        cursor.execute("""
+            SELECT DISTINCT Exam_Name
+            FROM Exams
+            WHERE Proctor_Email = %s
+            ORDER BY Exam_Name
+            """,
+            (session["user_email"],), 
+        )
         exam_names = [r[0] for r in cursor.fetchall()]
     finally:
         cursor.close()
@@ -186,58 +194,59 @@ def faculty_dash():
     # Fetch all exams from the database with sorting (so that they can be displayed on faculty page)
     sort_by = request.args.get("sort", "date")  # default sort by date
     selected_exam = request.args.get("exam", None)
-    cursor = mysql.get_db().cursor()
+
+    cursor = db.cursor()
     try:
+        base_query = """
+            SELECT
+            e.Exam_ID,
+            e.Exam_Name,
+            e.Exam_Date,
+            e.Exam_Time, 
+            e.Exam_Campus,
+            e.Exam_Location,
+            e.Duration_MIN,
+            (
+                SELECT COUNT(*)
+                FROM Registrations r
+                WHERE r.Exam_ID = e.Exam_ID
+                    AND r.status = 'active'
+            ) AS Capacity
+            FROM Exams e
+            WHERE e.Proctor_Email = %s
+        """
+        params = [session["user_email"]]
+
+        # if filter by exam name
+        if sort_by == "name" and selected_exam:
+            base_query += " AND Exam_Name = %s"
+            params.append(selected_exam)
+        
+        # apply ORDER BY based on sort_by
         if sort_by == "location":
-            cursor.execute(
-                """
-                SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
-                       Exam_Campus, Exam_Building, Duration_MIN, Capacity
-                FROM Exams
-                ORDER BY Exam_Campus, Exam_Building, Exam_Date, Exam_Time
-            """
-            )
+            order_by = " ORDER BY Exam_Campus, Exam_Location, Exam_Date, Exam_Time"
         elif sort_by == "name":
-            if selected_exam:
-                cursor.execute(
-                    """
-                    SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
-                           Exam_Campus, Exam_Building, Duration_MIN, Capacity
-                    FROM Exams
-                    WHERE Exam_Name = %s
-                    ORDER BY Exam_Date, Exam_Time
-                """,
-                    (selected_exam,),
-                )
-            else:
-                cursor.execute(
-                    """
-                    SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
-                           Exam_Campus, Exam_Building, Duration_MIN, Capacity
-                    FROM Exams
-                    ORDER BY Exam_Name, Exam_Date, Exam_Time
-                """
-                )
-        else:  # default to date
-            cursor.execute(
-                """
-                SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time, 
-                       Exam_Campus, Exam_Building, Duration_MIN, Capacity
-                FROM Exams
-                ORDER BY Exam_Date, Exam_Time
-            """
-            )
+            # if no specific exam selected, still sort by name
+            order_by = " ORDER BY Exam_Name, Exam_Date, Exam_Time"
+        else:  # default: date/time
+            order_by = " ORDER BY Exam_Date, Exam_Time"
+
+        final_query = base_query + order_by
+
+        cursor.execute(final_query, tuple(params))
         exams = _rows_to_dicts(cursor, cursor.fetchall())
     finally:
         cursor.close()
+    
     # NEW: Fetch all registrations with student names
-    cursor = mysql.get_db().cursor()
+    cursor = db.cursor()
     try:
         cursor.execute(
             """
             SELECT r.Exam_ID, u.First_Name, u.Last_Name
             FROM Registrations r
             JOIN Users u ON r.Student_Email = u.Email
+            WHERE r.status = 'active'
         """
         )
         registrations = cursor.fetchall()
@@ -298,7 +307,7 @@ def student_dash():
 
         # Fetch upcoming exams
         cursor.execute("""
-            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Building
+            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Location
             FROM Registrations r
             JOIN Exams e ON r.Exam_ID = e.Exam_ID
             WHERE r.Student_Email = %s
@@ -309,7 +318,7 @@ def student_dash():
         exams_raw = cursor.fetchall()
         exams = []
         for exam in exams_raw:
-            exam_id, name, date, time, campus, building = exam
+            exam_id, name, date, time, campus, location = exam
 
             if isinstance(date, datetime):
                 date_str = date.strftime("%m/%d/%Y")
@@ -321,7 +330,7 @@ def student_dash():
             else:
                 time_str = datetime.strptime(str(time), "%H:%M:%S").strftime("%I:%M %p")
 
-            exams.append((exam_id, name, date_str, time_str, campus, building))
+            exams.append((exam_id, name, date_str, time_str, campus, location))
 
 
 
@@ -537,16 +546,20 @@ def schedule():
                 e.Exam_Time,
                 e.Duration_MIN,
                 e.Exam_Campus,
-                e.Exam_Building,
+                e.Exam_Location,
                 (
                     SELECT COUNT(*)
                     FROM Registrations r
                     WHERE r.Exam_ID = e.Exam_ID
                       AND r.status = 'active'
-                ) AS Capacity   -- "seats taken" shown in last column
+                ) AS Capacity,        -- "seats taken" shown in last column
+                e.Proctor_Email,
+                CONCAT(u.First_Name, ' ', u.Last_Name) AS Proctor_Name
             FROM Exams e
+            JOIN Users u
+                ON e.Proctor_Email = u.Email
             WHERE {where_sql}
-            ORDER BY e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Building, e.Exam_ID
+            ORDER BY e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Location, e.Exam_ID
         """
         
         cursor.execute(query, tuple(params))
@@ -587,7 +600,7 @@ def exam_confirm(exam_id):
     try:
         cur.execute("""
             SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time,
-                    Exam_Campus, Exam_Building
+                    Exam_Campus, Exam_Location
             FROM Exams
             WHERE Exam_ID = %s
         """, (exam_id,)
@@ -604,7 +617,7 @@ def exam_confirm(exam_id):
             "date": str(row[2]),
             "time": str(row[3]),
             "campus": row[4],
-            "building": row[5],
+            "location": row[5],
         }
     return render_template('exam-conf.html', exam=exam)
 
