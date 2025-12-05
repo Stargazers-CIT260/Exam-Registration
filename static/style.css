@@ -267,12 +267,6 @@ h3 {
     line-height: 1.6;
 }
 
-.course-select {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .select-course {
     margin-left: 10px;
     padding: 5px;
