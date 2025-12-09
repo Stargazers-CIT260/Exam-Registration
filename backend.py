@@ -43,7 +43,7 @@ def validate_login(username, password, role):
 
 def normalize_email(email):
     email_info = validate_email(email, check_deliverability=False)
-    return email_info.normalized
+    return email_info.normalized.lower()
 
 
 @app.route("/")
@@ -124,6 +124,10 @@ def register():
 
         if role == "student" and not email[:10].isnumeric():
             msg = "Student must use NSHE number in email"
+            return render_template("registration.html", msg=msg)
+
+        if role == "faculty" and not email == f"{first_name}.{last_name}@csn.edu":
+            msg = "Faculty must use proper CSN email address"
             return render_template("registration.html", msg=msg)
 
         if role == "student" and password != email[:10]:
