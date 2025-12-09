@@ -315,9 +315,12 @@ def student_dash():
 
         # Fetch upcoming exams
         cursor.execute("""
-            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time, e.Exam_Campus, e.Exam_Location
+            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time, 
+                   e.Exam_Campus, e.Exam_Location,
+                   CONCAT(u.First_Name, ' ', u.Last_Name) AS Proctor_Name
             FROM Registrations r
             JOIN Exams e ON r.Exam_ID = e.Exam_ID
+            JOIN Users u ON e.Proctor_Email = u.Email
             WHERE r.Student_Email = %s
               AND r.status = 'active'
               AND e.Exam_Date >= CURDATE()
@@ -326,7 +329,7 @@ def student_dash():
         exams_raw = cursor.fetchall()
         exams = []
         for exam in exams_raw:
-            exam_id, name, date, time, campus, location = exam
+            exam_id, name, date, time, campus, location, proctor = exam
 
             if isinstance(date, datetime):
                 date_str = date.strftime("%m/%d/%Y")
@@ -338,7 +341,7 @@ def student_dash():
             else:
                 time_str = datetime.strptime(str(time), "%H:%M:%S").strftime("%I:%M %p")
 
-            exams.append((exam_id, name, date_str, time_str, campus, location))
+            exams.append((exam_id, name, date_str, time_str, campus, location, proctor))
 
 
 
@@ -607,12 +610,14 @@ def exam_confirm(exam_id):
 
     try:
         cur.execute("""
-            SELECT Exam_ID, Exam_Name, Exam_Date, Exam_Time,
-                    Exam_Campus, Exam_Location
-            FROM Exams
-            WHERE Exam_ID = %s
-        """, (exam_id,)
-        )
+            SELECT e.Exam_ID, e.Exam_Name, e.Exam_Date, e.Exam_Time,
+                   e.Exam_Campus, e.Exam_Location,
+                   CONCAT(u.First_Name, ' ', u.Last_Name) AS Proctor_Name
+            FROM Exams e
+            JOIN Users u 
+                ON e.Proctor_Email = u.Email
+            WHERE e.Exam_ID = %s
+        """, (exam_id,))
         row = cur.fetchone()
     finally:
         cur.close()
@@ -626,6 +631,7 @@ def exam_confirm(exam_id):
             "time": str(row[3]),
             "campus": row[4],
             "location": row[5],
+            "proctor": row[6],
         }
     return render_template('exam-conf.html', exam=exam)
 
