@@ -530,7 +530,7 @@ def schedule():
                 FROM Registrations r
                 WHERE r.Exam_ID = e.Exam_ID
                     AND r.status = 'active'
-                ) < 20 """
+                ) <= 20 """
         ]
         params = []
 
